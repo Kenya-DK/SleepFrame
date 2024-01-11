@@ -1,0 +1,24 @@
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\bin\Debug\SleepFrame.exe.config
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\bin\Debug\SleepFrame.exe
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\bin\Debug\SleepFrame.pdb
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.csproj.AssemblyReference.cache
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.csproj.SuggestedBindingRedirects.cache
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.Properties.Resources.resources
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.csproj.GenerateResource.cache
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.csproj.CoreCompileInputs.cache
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.exe
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.pdb
+C:\Users\Kenni Kristiansen\Downloads\SleepFrame\obj\Debug\SleepFrame.MainForm.resources
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\SleepFrame.exe.config
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\SleepFrame.exe
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\SleepFrame.pdb
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.csproj.AssemblyReference.cache
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.MainForm.resources
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.Properties.Resources.resources
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.csproj.GenerateResource.cache
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.csproj.CoreCompileInputs.cache
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.exe
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.pdb
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\MouseKeyboardLibrary.dll
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\MouseKeyboardLibrary.pdb
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.csproj.CopyComplete
