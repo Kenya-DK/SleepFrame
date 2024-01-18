@@ -8,26 +8,74 @@ using System.Windows.Forms;
 
 namespace SleepFrame.Macros
 {
+    /// <summary>
+    /// Trading.
+    /// </summary>
     public class Trading : MacroBase
     {
-        public Trading() : base(new TimeSpan(0, 0, 20))
-        {
 
+        #region Const/Static Values
+        #endregion
+        #region Private Values		
+
+        #endregion
+        #region New
+        /// <summary>
+        /// Creates a new generic <see cref="Trading"/>
+        /// </summary>
+        public Trading(string msg) : base(new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
+        {
+            _message = msg;
         }
 
+        #endregion
+        #region Method 			
+        private string _message;
+        #endregion
+        #region Override Method      
+        /// <summary>
+        /// Override ToString for <see cref="Trading"/>
+        /// </summary>
+        /// <returns>
+        /// Returns store data in string.
+        /// </returns>
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        /// <summary>
+        /// Override The Run Method to execute your own code
+        /// </summary>
         public override void Run()
         {
-            //System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
-            //Helper.Ctrl_V("WTB Any Rivens for [Glaive]450 [torid][Ocucor][Ceramic dagger]350 [Latron]200 [skana][dual ichor][Dual toxocyst][burston]100 [verglas][laetum][magistar]75 [hate][ogris]50");
-            //Helper.Ctrl_V("Hey");
-            System.Threading.Thread.Sleep(Helper.GetRandomDelay(1000, 1500));
-            Console.WriteLine("{ENTER}");
-            SendKeys.SendWait("{ENTER}");
-            //System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
-            //SendKeys.SendWait("{BACKSPACE}");
-            //System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
-            //SendKeys.SendWait("t");
-            //this.Stop();
+            // Removes the t typed when not in dojo 
+            Ahk.ExecRaw("Send {BackSpace}");
+            System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
+            // Sends the message
+            Ahk.ExecRaw($"SendInput {_message}");
+            System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
+            // Sends the enter key
+            Ahk.ExecRaw("Send {enter}");
+            System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
+            // Sends the t key to open the chat again
+            Ahk.ExecRaw("Send t");
         }
+
+        #endregion
+        #region Method Get Set
+
+        /// <summary>
+        /// Gets or sets the message to send.
+        /// </summary>
+        /// <remarks>
+        ///  This is the message that will be sent to the chat.
+        /// </remarks>
+        public string Message
+        {
+            get { return _message; }
+            set { _message = value; }
+        }
+        #endregion
     }
 }

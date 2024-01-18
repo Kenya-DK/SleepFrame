@@ -1,4 +1,5 @@
-﻿using SleepFrame.Macros;
+﻿using AutoHotkey.Interop;
+using SleepFrame.Macros;
 using SleepFrame.Model;
 using System;
 using System.Collections.Generic;
@@ -6,18 +7,21 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SleepFrame
 {
     public partial class MainForm : Form
     {
         Hotkey hkToggle = new Hotkey();
+        Hotkey hkRiven= new Hotkey();
         MacroBase currentMacro;
         bool is_runnig = false;
 
@@ -29,7 +33,7 @@ namespace SleepFrame
         private void LoadProgram()
         {
             Event(false);
-            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new Trading()));
+            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new Trading("Hi")));
             _chMacros.Items.Add(new ComboBoxItem("The Index", null, new TheIndex()));
             cbKeyToo.DataSource = Enum.GetValues(typeof(MouseShortcut));
             cbKeyOn.DataSource = Enum.GetValues(typeof(MouseShortcut2));
@@ -41,6 +45,12 @@ namespace SleepFrame
                 Toggle();
             };
             hkToggle.Register(this);
+            //hkRiven.KeyCode = Keys.F4;
+            //hkRiven.Pressed += delegate
+            //{
+            //    RivenOverlays.ChatRivenOpenedDetected();
+            //};
+            //hkRiven.Register(this);   
             #endregion
             #region Default
             cbKeyOn.SelectedItem = MouseShortcut2.None;
@@ -134,24 +144,51 @@ namespace SleepFrame
                 }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Trading tra = new Trading();
-            tra.Start();
-
-        }
-
         private void _chMacros_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBoxItem boxItem = (ComboBoxItem)_chMacros.SelectedItem;
 
             currentMacro = (MacroBase)boxItem.Vaule;
+
+            currentMacro.OnProcess += CurrentMacro_OnProcess;
+            currentMacro.OnStart += CurrentMacro_OnStart;
+            currentMacro.OnStop += CurrentMacro_OnStop;
+            currentMacro.OnNotify += CurrentMacro_OnNotify;
         }
+
+        private void CurrentMacro_OnNotify(object sender, Tuple<string, string, int> e)
+        {
+            _niApp.BalloonTipTitle = e.Item1;
+            _niApp.BalloonTipText = e.Item2;
+            _niApp.ShowBalloonTip(e.Item3);
+        }
+
+        private void CurrentMacro_OnStop(object sender, string e)
+        {
+            _niApp.Text = "SleepFrame";
+            _niApp.BalloonTipText = "Stopping";
+            _niApp.BalloonTipTitle = "Macro Stopped";
+            _niApp.ShowBalloonTip(1000);
+        }
+
+        private void CurrentMacro_OnStart(object sender, string e)
+        {
+            _niApp.BalloonTipText = "Starting";
+            _niApp.BalloonTipTitle = "Macro Started";
+            _niApp.ShowBalloonTip(1000);
+        }
+
+        private void CurrentMacro_OnProcess(object sender, string e)
+        {
+            _niApp.Text = "SleepFrame - " + e;
+            if (this._lblTimer.InvokeRequired)
+                this._lblTimer.BeginInvoke((MethodInvoker)delegate () { this._lblTimer.Text = e; ; });
+            else
+                this._lblTimer.Text = e.ToString();
+        }
+
         public void Toggle()
         {
-            SendKeys.Send("{ENTER}");
-            //Console.WriteLine("Running");
-            return;
             if (currentMacro == null) return;
             if (is_runnig)
             {

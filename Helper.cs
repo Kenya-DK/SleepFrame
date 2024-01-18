@@ -64,7 +64,7 @@ namespace SleepFrame
 
         public static Process GetWarframeProcess()
         {
-            //return Process.GetProcessesByName("notepad++").FirstOrDefault();
+            //return Process.GetProcessesByName("Notepad").FirstOrDefault();
             return Process.GetProcessesByName("Warframe.x64").FirstOrDefault();
         }
 

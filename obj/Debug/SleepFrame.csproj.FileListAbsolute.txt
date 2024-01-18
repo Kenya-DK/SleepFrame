@@ -22,3 +22,6 @@ C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.pdb
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\MouseKeyboardLibrary.dll
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\MouseKeyboardLibrary.pdb
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.csproj.CopyComplete
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\AutoHotkey.Interop.dll
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\Newtonsoft.Json.xml

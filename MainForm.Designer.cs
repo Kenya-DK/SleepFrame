@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this._btnStartOrStop = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this._chMacros = new System.Windows.Forms.ComboBox();
@@ -37,6 +39,8 @@
             this.cbKeyToo = new System.Windows.Forms.ComboBox();
             this.cbKeyOn = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
+            this._niApp = new System.Windows.Forms.NotifyIcon(this.components);
+            this._lblTimer = new System.Windows.Forms.Label();
             this.gbStart_HotKey.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,9 +75,9 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point(12, 82);
+            this.groupBox1.Location = new System.Drawing.Point(12, 99);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(570, 229);
+            this.groupBox1.Size = new System.Drawing.Size(570, 212);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Macro Settings";
@@ -140,17 +144,36 @@
             this.label4.TabIndex = 0;
             this.label4.Text = "+";
             // 
+            // _niApp
+            // 
+            this._niApp.BalloonTipText = "SleepFrame";
+            this._niApp.BalloonTipTitle = "SleepFrame";
+            this._niApp.Icon = ((System.Drawing.Icon)(resources.GetObject("_niApp.Icon")));
+            this._niApp.Text = "SleepFrame";
+            this._niApp.Visible = true;
+            // 
+            // _lblTimer
+            // 
+            this._lblTimer.AutoSize = true;
+            this._lblTimer.Location = new System.Drawing.Point(13, 80);
+            this._lblTimer.Name = "_lblTimer";
+            this._lblTimer.Size = new System.Drawing.Size(35, 13);
+            this._lblTimer.TabIndex = 7;
+            this._lblTimer.Text = "Idile...";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(594, 325);
+            this.Controls.Add(this._lblTimer);
             this.Controls.Add(this.gbStart_HotKey);
             this.Controls.Add(this._lbMacroDescription);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._chMacros);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._btnStartOrStop);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "SleepFrame";
             this.gbStart_HotKey.ResumeLayout(false);
@@ -170,6 +193,8 @@
         private System.Windows.Forms.ComboBox cbKeyToo;
         private System.Windows.Forms.ComboBox cbKeyOn;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NotifyIcon _niApp;
+        private System.Windows.Forms.Label _lblTimer;
     }
 }
 
