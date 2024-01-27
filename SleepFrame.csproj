@@ -58,6 +58,19 @@
     <Compile Include="Macros\MacroBase.cs" />
     <Compile Include="Macros\TheIndex.cs" />
     <Compile Include="Macros\Trading.cs" />
+    <Compile Include="Macros\UserControls.cs" />
+    <Compile Include="Macros\Views\TheIndexUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Macros\Views\TheIndexUserControl.Designer.cs">
+      <DependentUpon>TheIndexUserControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Macros\Views\TradingUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Macros\Views\TradingUserControl.Designer.cs">
+      <DependentUpon>TradingUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +82,9 @@
     <Compile Include="Model\Hotkey.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Macros\Views\TradingUserControl.resx">
+      <DependentUpon>TradingUserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -95,5 +111,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

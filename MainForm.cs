@@ -33,7 +33,7 @@ namespace SleepFrame
         private void LoadProgram()
         {
             Event(false);
-            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new Trading("Hi")));
+            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new Trading()));
             _chMacros.Items.Add(new ComboBoxItem("The Index", null, new TheIndex()));
             cbKeyToo.DataSource = Enum.GetValues(typeof(MouseShortcut));
             cbKeyOn.DataSource = Enum.GetValues(typeof(MouseShortcut2));
@@ -154,6 +154,9 @@ namespace SleepFrame
             currentMacro.OnStart += CurrentMacro_OnStart;
             currentMacro.OnStop += CurrentMacro_OnStop;
             currentMacro.OnNotify += CurrentMacro_OnNotify;
+
+            groupBox1.Controls.Clear();
+            groupBox1.Controls.Add(currentMacro.GetView());
         }
 
         private void CurrentMacro_OnNotify(object sender, Tuple<string, string, int> e)

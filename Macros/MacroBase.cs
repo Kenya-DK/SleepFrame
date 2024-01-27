@@ -38,10 +38,7 @@ namespace SleepFrame.Macros
             if (!_isRunning && (_current == TimeSpan.Zero || _nextInternal <= _current))
             {
                 _isRunning = true;
-                Process bProcess = Helper.GetWarframeProcess();
-                if (bProcess == null)
-                    throw new Exception("Warframe is not running");
-
+                Process bProcess = GetWarframeProcess() ?? throw new Exception("Warframe is not running");
                 Rect NotepadRect = new Rect();
                 GetWindowRect(bProcess.MainWindowHandle, ref NotepadRect);
                 var (X, Y) = NotepadRect.GetCenter();
@@ -58,7 +55,7 @@ namespace SleepFrame.Macros
                 //Helper.BlockInput(true);
                 System.Threading.Thread.Sleep(GetRandomDelay(750, 850));
                 Run();
-                Helper.BlockInput(false);
+                //Helper.BlockInput(false);
                 System.Threading.Thread.Sleep(GetRandomDelay(250, 750));
                 Cursor.Position = cPos;
                 Helper.SetProcessToForeground(activeProcess);
@@ -86,6 +83,10 @@ namespace SleepFrame.Macros
         }
 
         public virtual void Run()
+        {
+            throw new NotImplementedException();
+        }
+        public virtual UserControl GetView()
         {
             throw new NotImplementedException();
         }

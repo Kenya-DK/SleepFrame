@@ -18,5 +18,9 @@ namespace SleepFrame.Macros
         {
 
         }
+        public override UserControl GetView()
+        {
+            return new Views.TheIndexUserControl(this);
+        }
     }
 }

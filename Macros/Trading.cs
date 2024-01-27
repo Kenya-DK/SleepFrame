@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SleepFrame.Macros.Views;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,17 +21,33 @@ namespace SleepFrame.Macros
 
         #endregion
         #region New
+
         /// <summary>
         /// Creates a new generic <see cref="Trading"/>
         /// </summary>
-        public Trading(string msg) : base(new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
+        public Trading() : base(new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
         {
-            _message = msg;
+            _messages = new List<string>();
+        }
+        /// <summary>
+        /// Creates a new generic <see cref="Trading"/>
+        /// </summary>
+        public Trading(List<string> messages) : this()
+        {
+            _messages = messages;
+        }
+        /// <summary>
+        /// Creates a new generic <see cref="Trading"/>
+        /// </summary>
+        public Trading(string msg) : this()
+        {
+            _messages = new List<string>() { msg };
         }
 
         #endregion
         #region Method 			
-        private string _message;
+        private List<string> _messages;
+        private int _index = 0;
         #endregion
         #region Override Method      
         /// <summary>
@@ -49,33 +66,68 @@ namespace SleepFrame.Macros
         /// </summary>
         public override void Run()
         {
+
+            if (_messages.Count == 0)
+                return;
+            if (_index >= _messages.Count)
+                _index = 0;
+
             // Removes the t typed when not in dojo 
             Ahk.ExecRaw("Send {BackSpace}");
             System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
             // Sends the message
-            Ahk.ExecRaw($"SendInput {_message}");
+            Ahk.ExecRaw($"SendInput {_messages[_index]}");
             System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
             // Sends the enter key
             Ahk.ExecRaw("Send {enter}");
             System.Threading.Thread.Sleep(Helper.GetRandomDelay(50, 100));
             // Sends the t key to open the chat again
             Ahk.ExecRaw("Send t");
+
+            _index++;
+            if (_index >= _messages.Count)
+                _index = 0;
         }
 
+        public override UserControl GetView()
+        {
+            return new Views.TradingUserControl(this);
+        }
         #endregion
         #region Method Get Set
-
         /// <summary>
-        /// Gets or sets the message to send.
+        /// Gets or sets the messages to send.
         /// </summary>
         /// <remarks>
         ///  This is the message that will be sent to the chat.
         /// </remarks>
-        public string Message
+        public List<string> Messages
         {
-            get { return _message; }
-            set { _message = value; }
+            get { return _messages; }
+            set { _messages = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the index of the message to send.
+        /// </summary>
+        /// <remarks>
+        /// This is the index of the message that will be sent to the chat.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the index is out of range.
+        /// </exception>
+        public int Index
+        {
+            get { return _index; }
+            set
+            {
+                if (value < 0 || value >= _messages.Count)
+                    throw new ArgumentOutOfRangeException("Index is out of range.");
+                _index = value;
+            }
         }
         #endregion
+
+
     }
 }
