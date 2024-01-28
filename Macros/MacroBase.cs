@@ -47,16 +47,16 @@ namespace SleepFrame.Macros
                 var cPos = Cursor.Position;
 
                 Helper.SetProcessToForeground(bProcess);
-                System.Threading.Thread.Sleep(GetRandomDelay(250, 750));
+                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
 
                 Cursor.Position = new System.Drawing.Point(GetRandomDelay(X - 100, X + 100), GetRandomDelay(Y - 100, Y + 100));
-                System.Threading.Thread.Sleep(GetRandomDelay(250, 750));
+                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 MouseSimulator.Click(MouseButtons.Left);
                 //Helper.BlockInput(true);
-                System.Threading.Thread.Sleep(GetRandomDelay(750, 850));
+                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 Run();
                 //Helper.BlockInput(false);
-                System.Threading.Thread.Sleep(GetRandomDelay(250, 750));
+                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 Cursor.Position = cPos;
                 Helper.SetProcessToForeground(activeProcess);
                 _nextInternal = _nextInternal.Add(_internal);
