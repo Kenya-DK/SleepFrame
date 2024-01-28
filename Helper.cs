@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 namespace SleepFrame
 {
     
-    public class Helper
+    public static class Helper
     {
+        public static int lastWFProcessID = 0;
         private enum ShowWindowCommands : int
         {
             Hide = 0,
@@ -43,8 +44,6 @@ namespace SleepFrame
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
         public static extern bool BlockInput([System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)] bool fBlockIt);
 
-
-
         public struct Rect
         {
             public int Left { get; set; }
@@ -62,10 +61,42 @@ namespace SleepFrame
         }
 
 
+        static Helper()
+        {
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        while (!Helper.CheckIsWarframeIsOpen())
+                            Thread.Sleep(5000);
+                        Thread.Sleep(1500);
+                        while (Helper.CheckIsWarframeIsOpen())
+                            Thread.Sleep(5000);
+                    }
+                    catch (Exception ex)
+                    {
+                        Thread.Sleep(15000);
+                    }
+                }
+            })
+            {
+                IsBackground = true
+            }.Start();
+        }
+
+
         public static Process GetWarframeProcess()
         {
-            //return Process.GetProcessesByName("Notepad").FirstOrDefault();
             return Process.GetProcessesByName("Warframe.x64").FirstOrDefault();
+        }
+
+        public static bool CheckIsWarframeIsOpen()
+        {
+            Process process = GetWarframeProcess();
+            lastWFProcessID = process == null ? -1: process.Id;
+            return lastWFProcessID < 0;
         }
 
         public static Process GetActiveProcess()
@@ -89,47 +120,7 @@ namespace SleepFrame
                 SetForegroundWindow(process.MainWindowHandle);
             }
         }
-        [STAThread]
-        public static void Ctrl_V(string text)
-        {
-            // Get the clipboard object
-            //IDataObject clipboardObject = Clipboard.GetDataObject();
-
-            //// Walk through all (relevant) clipboard formats and save them in a new object
-            //var formats = clipboardObject.GetFormats(false);
-            //Dictionary<string, object> clipboardFormats = new Dictionary<string, object>();
-            //foreach (var format in formats)
-            //{
-            //    if (
-            //        format.Contains("Text") ||
-            //        format.Contains("Hyperlink") ||
-            //        format.Contains("HTML Format") ||
-            //        format.Contains("Bitmap")
-            //    )
-            //    {
-            //        // Add the clipboard format to the clipboard object
-            //        clipboardFormats.Add(format, clipboardObject.GetData(format));
-            //    }
-            //}
-            // Put new content to the clipboard - just to show we can destroy it before restoring again
-            
-            Clipboard.SetText(text);
-            System.Windows.Forms.SendKeys.SendWait("^{v}");
-
-
-            //// ---------
-            //// Restore the (semi) original clipboard - at least the relevant formats we have saved
-
-            //DataObject data = new DataObject();
-            //foreach (KeyValuePair<string, object> kvp in clipboardFormats)            
-            //    if (kvp.Value != null)                
-            //        data.SetData(kvp.Key, kvp.Value);
-
-            //// Copy the saved formats to the clipboard
-            //Clipboard.SetDataObject(data, true);
-
-
-        }
+       
         public static int GetRandomDelay(int min, int max)
         {
             Random random = new Random();

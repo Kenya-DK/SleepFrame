@@ -16,6 +16,7 @@ namespace SleepFrame
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            EELogProcessor.Start(); 
             Application.Run(new MainForm());
         }
     }

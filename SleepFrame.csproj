@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EELogProcessor.cs" />
     <Compile Include="Macros\MacroBase.cs" />
     <Compile Include="Macros\TheIndex.cs" />
     <Compile Include="Macros\Trading.cs" />

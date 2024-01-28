@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -128,6 +129,42 @@ namespace SleepFrame.Macros
         }
         #endregion
 
+
+        #region EELogs Methods 
+
+        public void AddEeLogEvents()
+        {
+            EELogProcessor.AddEvent(new EELogEvent("tradechat", new Dictionary<string, Action<System.Text.RegularExpressions.Match>>()
+                {
+                    { @"E\S{9}: L", Loading },
+                    { @"E\S{9}: S", Synchronizing },
+                    { @"E\S{9}: C", Connected },
+                })
+);
+        }
+
+        public void RemoveEeLogEvents()
+        {
+            EELogProcessor.RemoveEventByCategory("tradechat");
+        }
+
+        private void Loading(Match match)
+        {
+            Console.WriteLine("Loading");
+        }
+
+        private void Synchronizing(Match match)
+        {
+            Console.WriteLine("Synchronizing");
+        }
+
+
+        private void Connected(Match match)
+        {
+            Console.WriteLine("Connected");
+        }
+
+        #endregion
 
     }
 }
