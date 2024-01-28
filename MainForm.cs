@@ -152,14 +152,24 @@ namespace SleepFrame
                 currentMacro.CleanUp();
 
             currentMacro = (MacroBase)boxItem.Vaule;
+            currentMacro.LoadSettings();
 
             currentMacro.OnProcess += CurrentMacro_OnProcess;
             currentMacro.OnStart += CurrentMacro_OnStart;
             currentMacro.OnStop += CurrentMacro_OnStop;
             currentMacro.OnNotify += CurrentMacro_OnNotify;
+            currentMacro.OnUpdateStatus += CurrentMacro_OnUpdateStatus;
 
             groupBox1.Controls.Clear();
             groupBox1.Controls.Add(currentMacro.GetView());
+        }
+
+        private void CurrentMacro_OnUpdateStatus(object sender, string e)
+        {
+            if (this._lblTimer.InvokeRequired)
+                this._lblTimer.BeginInvoke((MethodInvoker)delegate () { this._lblTimer.Text = e; ; });
+            else
+                this._lblTimer.Text = e.ToString();
         }
 
         private void CurrentMacro_OnNotify(object sender, Tuple<string, string, int> e)

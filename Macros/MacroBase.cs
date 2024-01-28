@@ -1,7 +1,9 @@
 ﻿using AutoHotkey.Interop;
 using MouseKeyboardLibrary;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Timers;
 using System.Windows.Forms;
 using static SleepFrame.Helper;
@@ -10,6 +12,8 @@ namespace SleepFrame.Macros
 {
     public class MacroBase
     {
+        private string _id;
+        private string _settingsPath = "settings";
         private AutoHotkeyEngine _ahk = AutoHotkeyEngine.Instance;
         private readonly System.Timers.Timer _timer = new System.Timers.Timer(1000);
         private TimeSpan _nextInternal = TimeSpan.Zero;
@@ -29,8 +33,9 @@ namespace SleepFrame.Macros
 
         public event EventHandler<Tuple<string, string, int>> OnNotify;
 
-        public MacroBase(TimeSpan notifyTime, TimeSpan internalTime)
+        public MacroBase(string id, TimeSpan notifyTime, TimeSpan internalTime)
         {
+            _id = id;
             _internal = internalTime;
             _notifyTime = notifyTime;
             _timer.Elapsed += Timer_Elapsed;
@@ -55,7 +60,7 @@ namespace SleepFrame.Macros
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
 
                 Cursor.Position = new System.Drawing.Point(GetRandomDelay(X - 100, X + 100), GetRandomDelay(Y - 100, Y + 100));
-                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
+                System.Threading.Thread.Sleep(GetRandomDelay(250, 500));
                 MouseSimulator.Click(MouseButtons.Left);
                 //Helper.BlockInput(true);
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
@@ -73,9 +78,6 @@ namespace SleepFrame.Macros
                 return;
             _current = _current.Add(new TimeSpan(0, 0, 1));
 
-            Console.WriteLine(_nextInternal.Subtract(_current) == _notifyTime);
-            Console.WriteLine(_nextInternal);
-            Console.WriteLine(_current);
             if (_nextInternal.Subtract(_current) == _notifyTime)
                 OnNotify?.Invoke(this, new Tuple<string, string, int>("SleepFrame", "Next run in " + _nextInternal.Subtract(_current).ToString(), 250));
 
@@ -107,7 +109,23 @@ namespace SleepFrame.Macros
         {
         }
 
+        public virtual void LoadSettings()
+        {
+        }
 
+        public T GetSettings<T>() where T : class
+        {
+            if (!Directory.Exists(_settingsPath))
+                Directory.CreateDirectory(_settingsPath);
+            if (!File.Exists(Path.Combine(_settingsPath, _id + ".json")))
+                return null;
+            return JsonConvert.DeserializeObject<T>(File.ReadAllText(Path.Combine(_settingsPath, _id + ".json")));
+        }
+
+        public virtual void SaveSettings<T>(T settings)
+        {
+            File.WriteAllText(Path.Combine(_settingsPath, _id + ".json"), JsonConvert.SerializeObject(settings));
+        }
         /// <summary>
         /// Gets the view for the macro. This method should be overridden in a derived class.
         /// </summary>

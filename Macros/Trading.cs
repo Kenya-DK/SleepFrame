@@ -1,6 +1,7 @@
 ﻿using SleepFrame.Macros.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -26,28 +27,29 @@ namespace SleepFrame.Macros
         /// <summary>
         /// Creates a new generic <see cref="Trading"/>
         /// </summary>
-        public Trading() : base(new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
+        public Trading() : base("trading", new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
         {
-            _messages = new List<string>();
+            _messages = new ObservableCollection<string>();
+            _messages.CollectionChanged += (s, e) => { OnMessagesChanged(s, e); };
         }
         /// <summary>
         /// Creates a new generic <see cref="Trading"/>
         /// </summary>
         public Trading(List<string> messages) : this()
         {
-            _messages = messages;
+            _messages = new ObservableCollection<string>(messages);
         }
         /// <summary>
         /// Creates a new generic <see cref="Trading"/>
         /// </summary>
         public Trading(string msg) : this()
         {
-            _messages = new List<string>() { msg };
+            _messages.Add(msg);
         }
 
         #endregion
         #region Method 			
-        private List<string> _messages;
+        private ObservableCollection<string> _messages;
         private int _index = 0;
         #endregion
         #region Override Method      
@@ -94,6 +96,15 @@ namespace SleepFrame.Macros
         {
             return new Views.TradingUserControl(this);
         }
+
+        public override void LoadSettings()
+        {
+            Settings settings = GetSettings<Settings>();
+            if (settings == null)
+                return;
+            _messages = new ObservableCollection<string>(settings.Messages);
+            _messages.CollectionChanged += (s, e) => { OnMessagesChanged(s, e); };
+        }
         #endregion
         #region Method Get Set
         /// <summary>
@@ -102,7 +113,7 @@ namespace SleepFrame.Macros
         /// <remarks>
         ///  This is the message that will be sent to the chat.
         /// </remarks>
-        public List<string> Messages
+        public ObservableCollection<string> Messages
         {
             get { return _messages; }
             set { _messages = value; }
@@ -130,6 +141,12 @@ namespace SleepFrame.Macros
         #endregion
 
 
+        #region Events
+        private void OnMessagesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+                base.SaveSettings(new Settings() { Messages = _messages.ToList() });
+        }
+        #endregion
         #region EELogs Methods 
 
         public void AddEeLogEvents()
@@ -166,5 +183,18 @@ namespace SleepFrame.Macros
 
         #endregion
 
+        #region Settings
+        private class Settings
+        {
+            private List<string> _messages;
+
+            public List<string> Messages
+            {
+                get { return _messages; }
+                set { _messages = value; }
+            }
+
+        }
+        #endregion
     }
 }

@@ -18,6 +18,8 @@ namespace SleepFrame.Macros.Views
         {
             InitializeComponent();
             _trading = trading;
+            foreach (var item in _trading.Messages)
+                _lvMessages.Items.Add(new ListViewItem(item) { Tag = item });
         }
 
         private void _btnRemove_Click(object sender, EventArgs e)
@@ -31,7 +33,8 @@ namespace SleepFrame.Macros.Views
 
         private void _btnClear_Click(object sender, EventArgs e)
         {
-            _lvMessages.Clear();
+            _lvMessages.Items.Clear();
+            _trading.Messages.Clear();
         }
 
         private void _btnAdd_Click(object sender, EventArgs e)
