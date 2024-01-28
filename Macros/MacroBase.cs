@@ -17,12 +17,15 @@ namespace SleepFrame.Macros
         private TimeSpan _notifyTime = TimeSpan.Zero;
         private TimeSpan _internal;
         private bool _isRunning = false;
+        private bool _isPaused = false;
 
         public event EventHandler<string> OnProcess;
 
         public event EventHandler<string> OnStart;
 
         public event EventHandler<string> OnStop;
+
+        public event EventHandler<string> OnUpdateStatus;
 
         public event EventHandler<Tuple<string, string, int>> OnNotify;
 
@@ -35,6 +38,8 @@ namespace SleepFrame.Macros
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (_isPaused)
+                return;
             if (!_isRunning && (_current == TimeSpan.Zero || _nextInternal <= _current))
             {
                 _isRunning = true;
@@ -58,7 +63,7 @@ namespace SleepFrame.Macros
                 //Helper.BlockInput(false);
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 Cursor.Position = cPos;
-                Helper.SetProcessToForeground(activeProcess);
+                SetProcessToForeground(activeProcess);
                 _nextInternal = _nextInternal.Add(_internal);
 
                 _isRunning = false;
@@ -71,32 +76,61 @@ namespace SleepFrame.Macros
             Console.WriteLine(_nextInternal.Subtract(_current) == _notifyTime);
             Console.WriteLine(_nextInternal);
             Console.WriteLine(_current);
-            if (_nextInternal.Subtract(_current) == _notifyTime)            
+            if (_nextInternal.Subtract(_current) == _notifyTime)
                 OnNotify?.Invoke(this, new Tuple<string, string, int>("SleepFrame", "Next run in " + _nextInternal.Subtract(_current).ToString(), 250));
 
             OnProcess?.Invoke(this, $"Next run in {_nextInternal.Subtract(_current)}");
         }
 
+        /// <summary>
+        /// Gets the internal TimeSpan value.
+        /// </summary>
         public TimeSpan Internal
         {
             get { return _internal; }
         }
 
+        /// <summary>
+        /// Runs the macro. This method should be overridden in a derived class.
+        /// </summary>
         public virtual void Run()
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Performs cleanup operations for the macro.
+        /// This method is virtual and does not perform any operations by default.
+        /// It should be overridden in derived classes to perform any necessary cleanup before the macro is destroyed.
+        /// </summary>
+        public virtual void CleanUp()
+        {
+        }
+
+
+        /// <summary>
+        /// Gets the view for the macro. This method should be overridden in a derived class.
+        /// </summary>
+        /// <returns>A UserControl representing the view for the macro.</returns>
         public virtual UserControl GetView()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Starts the macro. This method triggers the OnProcess and OnStart events and starts the timer.
+        /// </summary>
         public virtual void Start()
         {
             OnProcess?.Invoke(this, "Starting...");
             OnStart?.Invoke(this, "");
             _timer.Start();
         }
+        /// <summary>
+        /// Stops the execution of the macro.
+        /// This method stops the timer, resets the 'nextInternal' and 'current' timespans to zero,
+        /// and invokes the 'OnStop' and 'OnProcess' events with appropriate parameters.
+        /// </summary>
         public virtual void Stop()
         {
             _timer.Stop();
@@ -104,6 +138,31 @@ namespace SleepFrame.Macros
             _current = TimeSpan.Zero;
             OnStop?.Invoke(this, "");
             OnProcess?.Invoke(this, "Idle");
+        }
+
+        /// <summary>
+        /// Pauses the macro execution by setting the '_isPaused' flag to true.
+        /// </summary>
+        public void Pause()
+        {
+            _isPaused = true;
+        }
+
+        /// <summary>
+        /// Resumes the macro execution by setting the '_isPaused' flag to false.
+        /// </summary>
+        public void Resume()
+        {
+            _isPaused = false;
+        }
+
+        /// <summary>
+        /// Updates the status and triggers the OnUpdateStatus event.
+        /// </summary>
+        /// <param name="status">The new status to set.</param>
+        public void UpdateStatus(string status)
+        {
+            OnUpdateStatus?.Invoke(this, status);
         }
 
         public AutoHotkeyEngine Ahk

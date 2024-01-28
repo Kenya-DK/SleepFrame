@@ -148,6 +148,9 @@ namespace SleepFrame
         {
             ComboBoxItem boxItem = (ComboBoxItem)_chMacros.SelectedItem;
 
+            if (currentMacro != null)
+                currentMacro.CleanUp();
+
             currentMacro = (MacroBase)boxItem.Vaule;
 
             currentMacro.OnProcess += CurrentMacro_OnProcess;

@@ -140,7 +140,7 @@ namespace SleepFrame.Macros
                     { @"E\S{9}: S", Synchronizing },
                     { @"E\S{9}: C", Connected },
                 })
-);
+            );
         }
 
         public void RemoveEeLogEvents()
