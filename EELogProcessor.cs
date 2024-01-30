@@ -119,7 +119,9 @@ namespace SleepFrame
             {
                 Match match = Regex.Match(line, pattern.Key);
                 if (match.Success)
+                {
                     pattern.Value(match);
+                }
             }
         }
 

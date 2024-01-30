@@ -105,6 +105,15 @@ namespace SleepFrame.Macros
             _messages = new ObservableCollection<string>(settings.Messages);
             _messages.CollectionChanged += (s, e) => { OnMessagesChanged(s, e); };
         }
+
+        public override void Initialize()
+        {
+            AddEeLogEvents();
+        }
+        public override void UnInitialize()
+        {
+            RemoveEeLogEvents();
+        }
         #endregion
         #region Method Get Set
         /// <summary>
@@ -149,7 +158,7 @@ namespace SleepFrame.Macros
         #endregion
         #region EELogs Methods 
 
-        public void AddEeLogEvents()
+        private void AddEeLogEvents()
         {
             EELogProcessor.AddEvent(new EELogEvent("tradechat", new Dictionary<string, Action<System.Text.RegularExpressions.Match>>()
                 {
@@ -160,7 +169,7 @@ namespace SleepFrame.Macros
             );
         }
 
-        public void RemoveEeLogEvents()
+        private void RemoveEeLogEvents()
         {
             EELogProcessor.RemoveEventByCategory("tradechat");
         }

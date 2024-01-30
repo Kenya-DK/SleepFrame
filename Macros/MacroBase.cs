@@ -101,11 +101,20 @@ namespace SleepFrame.Macros
         }
 
         /// <summary>
-        /// Performs cleanup operations for the macro.
+        /// Initializes the macro.
         /// This method is virtual and does not perform any operations by default.
-        /// It should be overridden in derived classes to perform any necessary cleanup before the macro is destroyed.
+        /// It should be overridden in derived classes to perform any necessary initialization before the macro is used.
         /// </summary>
-        public virtual void CleanUp()
+        public virtual void Initialize()
+        {
+        }
+
+        /// <summary>
+        /// Uninitializes the macro.
+        /// This method is virtual and does not perform any operations by default.
+        /// It should be overridden in derived classes to perform any necessary operations when the macro is no longer needed.
+        /// </summary>
+        public virtual void UnInitialize()
         {
         }
 

@@ -43,6 +43,7 @@ namespace SleepFrame.Macros.Views
             {
                 _lvMessages.Items.Add(new ListViewItem(textBox1.Text) { Tag = textBox1.Text });
                 _trading.Messages.Add(textBox1.Text);
+                textBox1.Text = string.Empty;
             }
         }
     }
