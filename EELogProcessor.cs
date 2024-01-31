@@ -53,41 +53,19 @@ namespace SleepFrame
                 {
                     try
                     {
-                        using (MemoryMappedFile orOpen = MemoryMappedFile.CreateOrOpen("DBWIN_BUFFER", 4096L))
+                        if (Helper.lastWFProcessID == -1)
+                            continue;
+                        string eeLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Warframe\EE.log");
+                        var fs = new FileStream(eeLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        using (var sr = new StreamReader(fs))
                         {
-                            bool createdNew1;
-                            using (EventWaitHandle eventWaitHandle1 = new EventWaitHandle(false, EventResetMode.AutoReset, "DBWIN_BUFFER_READY", out createdNew1))
+                            var lastLine = "";
+                            while (Helper.lastWFProcessID != -1)
                             {
-                                try
+                                lastLine = sr.ReadLine();
+                                if (lastLine != null)
                                 {
-                                    if (Helper.lastWFProcessID == -1)
-                                        continue;
-
-                                    using (EventWaitHandle eventWaitHandle2 = new EventWaitHandle(false, EventResetMode.AutoReset, "DBWIN_DATA_READY", out bool createdNew2))
-                                    {
-                                        char[] chArray = new char[5000];
-                                        while (Helper.lastWFProcessID != -1)
-                                        {
-                                            eventWaitHandle1.Set();
-                                            if (eventWaitHandle2.WaitOne(TimeSpan.FromSeconds(3.0)))
-                                                using (MemoryMappedViewStream viewStream = orOpen.CreateViewStream())
-                                                using (BinaryReader binaryReader = new BinaryReader(viewStream, Encoding.UTF8))
-                                                    if (binaryReader.ReadUInt32() == Helper.lastWFProcessID)
-                                                    {
-                                                        char[] array = binaryReader.ReadChars(4092);
-                                                        ProcessLine(new string(array, 0, Array.IndexOf<char>(array, char.MinValue)));
-                                                    }
-                                        }
-                                    }
-
-                                }
-                                catch
-                                {
-                                    Thread.Sleep(10000);
-                                }
-                                finally
-                                {
-                                    eventWaitHandle1.Set();
+                                    ProcessLine(lastLine);
                                 }
                             }
                         }
