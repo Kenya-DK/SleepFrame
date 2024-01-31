@@ -20,7 +20,7 @@ namespace SleepFrame.Macros
         #region Const/Static Values
         #endregion
         #region Private Values		
-
+        private bool _isEnterDojo = false;
         #endregion
         #region New
 
@@ -162,6 +162,7 @@ namespace SleepFrame.Macros
         {
             EELogProcessor.AddEvent(new EELogEvent("tradechat", new Dictionary<string, Action<System.Text.RegularExpressions.Match>>()
                 {
+                    { @"M\S{6}\sn\S{4}\sD", EnteringDojo },
                     { @"E\S{9}: L", Loading },
                     { @"E\S{9}: S", Synchronizing },
                     { @"E\S{9}: C", Connected },
@@ -174,20 +175,31 @@ namespace SleepFrame.Macros
             EELogProcessor.RemoveEventByCategory("tradechat");
         }
 
+        private void EnteringDojo(Match match)
+        {
+            Console.WriteLine("Entering Dojo");
+            _isEnterDojo = true;
+        }
+
         private void Loading(Match match)
         {
             Console.WriteLine("Loading");
+            if (!_isEnterDojo)
+                Pause();
         }
 
         private void Synchronizing(Match match)
         {
             Console.WriteLine("Synchronizing");
+            if (_isEnterDojo)
+                Pause();
         }
 
 
         private void Connected(Match match)
         {
             Console.WriteLine("Connected");
+            Resume();
         }
 
         #endregion
