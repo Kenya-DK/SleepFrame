@@ -174,7 +174,6 @@ namespace SleepFrame.Macros
         {
             EELogProcessor.RemoveEventByCategory("tradechat");
         }
-
         private void EnteringDojo(Match match)
         {
             Console.WriteLine("Entering Dojo");
