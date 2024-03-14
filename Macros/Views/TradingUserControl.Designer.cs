@@ -35,12 +35,14 @@
             this._btnAdd = new System.Windows.Forms.Button();
             this._btnClear = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this._chBtn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // _lvMessages
             // 
             this._lvMessages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this._chMsg});
+            this._chMsg,
+            this._chBtn});
             this._lvMessages.GridLines = true;
             this._lvMessages.HideSelection = false;
             this._lvMessages.Location = new System.Drawing.Point(4, 36);
@@ -53,7 +55,7 @@
             // _chMsg
             // 
             this._chMsg.Text = "Message";
-            this._chMsg.Width = 650;
+            this._chMsg.Width = 588;
             // 
             // label1
             // 
@@ -102,6 +104,10 @@
             this.textBox1.Size = new System.Drawing.Size(661, 20);
             this.textBox1.TabIndex = 3;
             // 
+            // _chBtn
+            // 
+            this._chBtn.Text = "";
+            // 
             // TradingUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -128,5 +134,6 @@
         private System.Windows.Forms.Button _btnAdd;
         private System.Windows.Forms.Button _btnClear;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ColumnHeader _chBtn;
     }
 }

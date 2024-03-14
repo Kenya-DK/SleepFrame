@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,6 @@ namespace SleepFrame
     public partial class MainForm : Form
     {
         Hotkey hkToggle = new Hotkey();
-        Hotkey hkRiven= new Hotkey();
         MacroBase currentMacro;
         bool is_runnig = false;
 
@@ -45,12 +45,6 @@ namespace SleepFrame
                 Toggle();
             };
             hkToggle.Register(this);
-            //hkRiven.KeyCode = Keys.F4;
-            //hkRiven.Pressed += delegate
-            //{
-            //    RivenOverlays.ChatRivenOpenedDetected();
-            //};
-            //hkRiven.Register(this);   
             #endregion
             #region Default
             cbKeyOn.SelectedItem = MouseShortcut2.None;
@@ -167,10 +161,15 @@ namespace SleepFrame
 
         private void CurrentMacro_OnUpdateStatus(object sender, string e)
         {
-            if (this._lblTimer.InvokeRequired)
-                this._lblTimer.BeginInvoke((MethodInvoker)delegate () { this._lblTimer.Text = e; ; });
+            UpaterTimerText(e);
+        }
+
+        private void UpaterTimerText(string e)
+        {
+            if (_lblTimer.InvokeRequired)
+                _lblTimer.BeginInvoke((MethodInvoker)delegate () { _lblTimer.Text = e; ; });
             else
-                this._lblTimer.Text = e.ToString();
+                _lblTimer.Text = e;
         }
 
         private void CurrentMacro_OnNotify(object sender, Tuple<string, string, int> e)
@@ -198,24 +197,22 @@ namespace SleepFrame
         private void CurrentMacro_OnProcess(object sender, string e)
         {
             _niApp.Text = "SleepFrame - " + e;
-            if (this._lblTimer.InvokeRequired)
-                this._lblTimer.BeginInvoke((MethodInvoker)delegate () { this._lblTimer.Text = e; ; });
-            else
-                this._lblTimer.Text = e.ToString();
+            UpaterTimerText(e);
         }
 
         public void Toggle()
         {
             if (currentMacro == null) return;
+            is_runnig = !is_runnig;
             if (is_runnig)
             {
-                currentMacro.Stop();
-                is_runnig = false;
+                currentMacro.Start();
+                _niApp.Icon = Properties.Resources.app_icon_on;
             }
             else
             {
-                currentMacro.Start();
-                is_runnig = true;
+                currentMacro.Stop();
+                _niApp.Icon = Properties.Resources.app_icon;
             }
         }
         #region Event
