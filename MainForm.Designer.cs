@@ -41,12 +41,14 @@
             this.label4 = new System.Windows.Forms.Label();
             this._niApp = new System.Windows.Forms.NotifyIcon(this.components);
             this._lblTimer = new System.Windows.Forms.Label();
+            this._numNotifyTimer = new System.Windows.Forms.NumericUpDown();
             this.gbStart_HotKey.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numNotifyTimer)).BeginInit();
             this.SuspendLayout();
             // 
             // _btnStartOrStop
             // 
-            this._btnStartOrStop.Location = new System.Drawing.Point(12, 52);
+            this._btnStartOrStop.Location = new System.Drawing.Point(12, 78);
             this._btnStartOrStop.Name = "_btnStartOrStop";
             this._btnStartOrStop.Size = new System.Drawing.Size(164, 23);
             this._btnStartOrStop.TabIndex = 1;
@@ -75,7 +77,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point(12, 99);
+            this.groupBox1.Location = new System.Drawing.Point(12, 127);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(670, 210);
             this.groupBox1.TabIndex = 4;
@@ -94,7 +96,7 @@
             this.gbStart_HotKey.Controls.Add(this.cbKeyToo);
             this.gbStart_HotKey.Controls.Add(this.cbKeyOn);
             this.gbStart_HotKey.Controls.Add(this.label4);
-            this.gbStart_HotKey.Location = new System.Drawing.Point(192, 8);
+            this.gbStart_HotKey.Location = new System.Drawing.Point(184, 28);
             this.gbStart_HotKey.Name = "gbStart_HotKey";
             this.gbStart_HotKey.Size = new System.Drawing.Size(127, 68);
             this.gbStart_HotKey.TabIndex = 6;
@@ -155,17 +157,26 @@
             // _lblTimer
             // 
             this._lblTimer.AutoSize = true;
-            this._lblTimer.Location = new System.Drawing.Point(13, 80);
+            this._lblTimer.Location = new System.Drawing.Point(18, 111);
             this._lblTimer.Name = "_lblTimer";
             this._lblTimer.Size = new System.Drawing.Size(35, 13);
             this._lblTimer.TabIndex = 7;
             this._lblTimer.Text = "Idile...";
             // 
+            // _numNotifyTimer
+            // 
+            this._numNotifyTimer.Location = new System.Drawing.Point(12, 52);
+            this._numNotifyTimer.Name = "_numNotifyTimer";
+            this._numNotifyTimer.Size = new System.Drawing.Size(163, 20);
+            this._numNotifyTimer.TabIndex = 8;
+            this._numNotifyTimer.ValueChanged += new System.EventHandler(this._numNotifyTimer_ValueChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(697, 325);
+            this.ClientSize = new System.Drawing.Size(697, 346);
+            this.Controls.Add(this._numNotifyTimer);
             this.Controls.Add(this._lblTimer);
             this.Controls.Add(this.gbStart_HotKey);
             this.Controls.Add(this._lbMacroDescription);
@@ -178,6 +189,7 @@
             this.Text = "SleepFrame";
             this.gbStart_HotKey.ResumeLayout(false);
             this.gbStart_HotKey.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numNotifyTimer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,6 +207,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NotifyIcon _niApp;
         private System.Windows.Forms.Label _lblTimer;
+        private System.Windows.Forms.NumericUpDown _numNotifyTimer;
     }
 }
 

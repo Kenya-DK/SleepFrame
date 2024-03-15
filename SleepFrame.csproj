@@ -35,6 +35,10 @@
   <PropertyGroup>
     <ApplicationIcon>app_icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoHotkey.Interop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\AutoHotkey.Interop.1.0.0.1\lib\net45\AutoHotkey.Interop.dll</HintPath>
@@ -86,6 +90,9 @@
     <Compile Include="Model\Hotkey.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Macros\Views\TheIndexUserControl.resx">
+      <DependentUpon>TheIndexUserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Macros\Views\TradingUserControl.resx">
       <DependentUpon>TradingUserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -102,6 +109,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

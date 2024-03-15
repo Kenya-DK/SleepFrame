@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-
 namespace SleepFrame
 {
-    
+
     public static class Helper
     {
         public static int lastWFProcessID = 0;
@@ -95,7 +91,7 @@ namespace SleepFrame
         public static bool CheckIsWarframeIsOpen()
         {
             Process process = GetWarframeProcess();
-            lastWFProcessID = process == null ? -1: process.Id;
+            lastWFProcessID = process == null ? -1 : process.Id;
             return lastWFProcessID < 0;
         }
 
@@ -120,7 +116,7 @@ namespace SleepFrame
                 SetForegroundWindow(process.MainWindowHandle);
             }
         }
-       
+
         public static int GetRandomDelay(int min, int max)
         {
             Random random = new Random();

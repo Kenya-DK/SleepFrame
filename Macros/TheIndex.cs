@@ -10,7 +10,7 @@ namespace SleepFrame.Macros
 {
     public class TheIndex : MacroBase
     {
-        public TheIndex() : base("TheIndex", new TimeSpan(0, 0, 5), new TimeSpan(0, 0, 10))
+        public TheIndex() : base("TheIndex", new TimeSpan(0, 0, 10))
         {
 
         }

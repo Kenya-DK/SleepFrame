@@ -27,7 +27,7 @@ namespace SleepFrame.Macros
         /// <summary>
         /// Creates a new generic <see cref="Trading"/>
         /// </summary>
-        public Trading() : base("trading", new TimeSpan(0, 0, 35), new TimeSpan(0, 2, 0))
+        public Trading() : base("trading", new TimeSpan(0, 2, 0))
         {
             _messages = new ObservableCollection<string>();
             _messages.CollectionChanged += (s, e) => { OnMessagesChanged(s, e); };

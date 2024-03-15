@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SleepFrame.Helper;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SleepFrame
@@ -206,6 +207,7 @@ namespace SleepFrame
             is_runnig = !is_runnig;
             if (is_runnig)
             {
+
                 currentMacro.Start();
                 _niApp.Icon = Properties.Resources.app_icon_on;
             }
@@ -214,6 +216,8 @@ namespace SleepFrame
                 currentMacro.Stop();
                 _niApp.Icon = Properties.Resources.app_icon;
             }
+            _numNotifyTimer.Enabled = !is_runnig;
+            _chMacros.Enabled = _numNotifyTimer.Enabled;
         }
         #region Event
 
@@ -222,6 +226,12 @@ namespace SleepFrame
             Toggle();
         }
         #endregion
+
+        private void _numNotifyTimer_ValueChanged(object sender, EventArgs e)
+        {
+            if (currentMacro == null) return;
+            currentMacro.NotifyTimer = new TimeSpan(0, 0, (int)_numNotifyTimer.Value);
+        }
     }
     #region Enum
     public enum MouseSpeed { Instant, SuperSlow, Slow, Natural = 3, Fast = 5, SuperFast = 8 };

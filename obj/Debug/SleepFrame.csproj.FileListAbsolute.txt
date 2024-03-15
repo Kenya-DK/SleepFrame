@@ -26,3 +26,4 @@ C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\AutoHotkey.Int
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\bin\Debug\Newtonsoft.Json.xml
 C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.Macros.Views.TradingUserControl.resources
+C:\Users\Kenya\Desktop\Andet\Coding\Warframe\SleepFrame\obj\Debug\SleepFrame.Macros.Views.TheIndexUserControl.resources

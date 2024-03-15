@@ -2,8 +2,11 @@
 using MouseKeyboardLibrary;
 using Newtonsoft.Json;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Timers;
 using System.Windows.Forms;
 using static SleepFrame.Helper;
@@ -33,11 +36,10 @@ namespace SleepFrame.Macros
 
         public event EventHandler<Tuple<string, string, int>> OnNotify;
 
-        public MacroBase(string id, TimeSpan notifyTime, TimeSpan internalTime)
+        public MacroBase(string id, TimeSpan internalTime)
         {
             _id = id;
             _internal = internalTime;
-            _notifyTime = notifyTime;
             _timer.Elapsed += Timer_Elapsed;
         }
 
@@ -59,16 +61,18 @@ namespace SleepFrame.Macros
                 Helper.SetProcessToForeground(bProcess);
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
 
+                // Set The Cursor Position on Warframe
                 Cursor.Position = new System.Drawing.Point(GetRandomDelay(X - 100, X + 100), GetRandomDelay(Y - 100, Y + 100));
                 System.Threading.Thread.Sleep(GetRandomDelay(250, 500));
+
                 MouseSimulator.Click(MouseButtons.Left);
-                //Helper.BlockInput(true);
+                _ahk.ExecRaw($"BlockInput ON");
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 Run();
-                //Helper.BlockInput(false);
                 System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
                 Cursor.Position = cPos;
                 SetProcessToForeground(activeProcess);
+                _ahk.ExecRaw($"BlockInput OFF");
                 _nextInternal = _nextInternal.Add(_internal);
 
                 _isRunning = false;
@@ -192,11 +196,25 @@ namespace SleepFrame.Macros
             OnUpdateStatus?.Invoke(this, status);
         }
 
+        #region Method Get Set
+        /// <summary>
+        /// Gets or sets the messages to send.
+        /// </summary>
+        /// <remarks>
+        ///  This is the message that will be sent to the chat.
+        /// </remarks>
+        public TimeSpan NotifyTimer
+        {
+            get { return _notifyTime; }
+            set { _notifyTime = value; }
+        }
+
         public AutoHotkeyEngine Ahk
         {
             get { return _ahk; }
             set { _ahk = value; }
         }
+        #endregion
 
     }
 }
