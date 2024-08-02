@@ -1,4 +1,5 @@
 ﻿using AutoHotkey.Interop;
+using Newtonsoft.Json.Linq;
 using SleepFrame.Macros;
 using SleepFrame.Model;
 using System;
@@ -8,6 +9,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SleepFrame.Helper;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SleepFrame
 {
@@ -34,8 +37,9 @@ namespace SleepFrame
         private void LoadProgram()
         {
             Event(false);
-            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new Trading()));
-            _chMacros.Items.Add(new ComboBoxItem("The Index", null, new TheIndex()));
+            _chMacros.Items.Add(new ComboBoxItem("Trading", null, new TradingMacro()));
+            //_chMacros.Items.Add(new ComboBoxItem<TheIndex>("The Index", null, new TheIndex()));
+            //_chMacros.Items.Add(new ComboBoxItem<NightwaveSkip>("Nightwave Skip", null, new NightwaveSkip()));
             cbKeyToo.DataSource = Enum.GetValues(typeof(MouseShortcut));
             cbKeyOn.DataSource = Enum.GetValues(typeof(MouseShortcut2));
 
@@ -141,14 +145,22 @@ namespace SleepFrame
 
         private void _chMacros_SelectedIndexChanged(object sender, EventArgs e)
         {
+
             ComboBoxItem boxItem = (ComboBoxItem)_chMacros.SelectedItem;
 
-            if (currentMacro != null)
-                currentMacro.UnInitialize();
+            //if (currentMacro != null)
+            //    currentMacro.UnInitialize();
 
             currentMacro = (MacroBase)boxItem.Vaule;
-            currentMacro.Initialize();
-            currentMacro.LoadSettings();
+            currentMacro.LoadFromFile();
+
+            _chNotifyEnable.CheckedChanged -= _chNotifyEnable_CheckedChanged;
+            _numNotifyTimer.ValueChanged -= _numNotifyTimer_ValueChanged;
+            _chNotifyEnable.Checked = currentMacro.NotifyTime > TimeSpan.Zero;
+            _numNotifyTimer.Enabled = _chNotifyEnable.Checked;
+            _numNotifyTimer.Value = (int)currentMacro.NotifyTime.TotalSeconds;
+            _chNotifyEnable.CheckedChanged += _chNotifyEnable_CheckedChanged;
+            _numNotifyTimer.ValueChanged += _numNotifyTimer_ValueChanged;
 
             currentMacro.OnProcess += CurrentMacro_OnProcess;
             currentMacro.OnStart += CurrentMacro_OnStart;
@@ -157,20 +169,14 @@ namespace SleepFrame
             currentMacro.OnUpdateStatus += CurrentMacro_OnUpdateStatus;
 
             groupBox1.Controls.Clear();
-            groupBox1.Controls.Add(currentMacro.GetView());
+            var view = currentMacro.GetView();
+            if (currentMacro != null && view != null)
+                groupBox1.Controls.Add(view);
         }
 
         private void CurrentMacro_OnUpdateStatus(object sender, string e)
         {
-            UpaterTimerText(e);
-        }
-
-        private void UpaterTimerText(string e)
-        {
-            if (_lblTimer.InvokeRequired)
-                _lblTimer.BeginInvoke((MethodInvoker)delegate () { _lblTimer.Text = e; ; });
-            else
-                _lblTimer.Text = e;
+            _lblTimer.InvokeIfRequired(() => { _lblTimer.Text = "Start"; });
         }
 
         private void CurrentMacro_OnNotify(object sender, Tuple<string, string, int> e)
@@ -182,42 +188,41 @@ namespace SleepFrame
 
         private void CurrentMacro_OnStop(object sender, string e)
         {
+            is_runnig = false;
+            _niApp.Icon = Properties.Resources.app_icon;
+            _btnStartOrStop.InvokeIfRequired(() => { _btnStartOrStop.Text = "Start"; });
             _niApp.Text = "SleepFrame";
             _niApp.BalloonTipText = "Stopping";
             _niApp.BalloonTipTitle = "Macro Stopped";
             _niApp.ShowBalloonTip(1000);
+            _chMacros.InvokeIfRequired(() => { _chMacros.Enabled = true; });
         }
 
         private void CurrentMacro_OnStart(object sender, string e)
         {
+            is_runnig = true;
+            _niApp.Icon = Properties.Resources.app_icon_on;
+            _btnStartOrStop.InvokeIfRequired(() => { _btnStartOrStop.Text = "Stop"; });
+            _chMacros.Enabled = false;
             _niApp.BalloonTipText = "Starting";
             _niApp.BalloonTipTitle = "Macro Started";
             _niApp.ShowBalloonTip(1000);
+            _chMacros.InvokeIfRequired(() => { _chMacros.Enabled = false; });
         }
 
         private void CurrentMacro_OnProcess(object sender, string e)
         {
             _niApp.Text = "SleepFrame - " + e;
-            UpaterTimerText(e);
+            _lblTimer.InvokeIfRequired(() => { _lblTimer.Text = e; });
         }
 
         public void Toggle()
         {
             if (currentMacro == null) return;
-            is_runnig = !is_runnig;
-            if (is_runnig)
-            {
-
+            if (!is_runnig)
                 currentMacro.Start();
-                _niApp.Icon = Properties.Resources.app_icon_on;
-            }
             else
-            {
                 currentMacro.Stop();
-                _niApp.Icon = Properties.Resources.app_icon;
-            }
-            _numNotifyTimer.Enabled = !is_runnig;
-            _chMacros.Enabled = _numNotifyTimer.Enabled;
         }
         #region Event
 
@@ -230,7 +235,16 @@ namespace SleepFrame
         private void _numNotifyTimer_ValueChanged(object sender, EventArgs e)
         {
             if (currentMacro == null) return;
-            currentMacro.NotifyTimer = new TimeSpan(0, 0, (int)_numNotifyTimer.Value);
+            currentMacro.NotifyTime= new TimeSpan(0, 0, (int)_numNotifyTimer.Value);
+            currentMacro.SaveToFile();
+        }
+
+        private void _chNotifyEnable_CheckedChanged(object sender, EventArgs e)
+        {
+            if (currentMacro == null) return;
+            _numNotifyTimer.Enabled = _chNotifyEnable.Checked;
+            currentMacro.NotifyTime = _chNotifyEnable.Checked ? new TimeSpan(0, 0, (int)_numNotifyTimer.Value) : TimeSpan.Zero;
+            currentMacro.SaveToFile();
         }
     }
     #region Enum
@@ -241,4 +255,5 @@ namespace SleepFrame
     public enum MouseShortcut2 { None = -1, Ctrl = 13, Shift = 14, Alt = 15 }
     public enum MouseShortcut { None = -1, F1 = 0, F2 = 1, F3 = 2, F4 = 3, F5 = 4, F6 = 5, F7 = 6, F8 = 7, F9 = 8, F10 = 9, F11 = 10, F12 = 11, Enter = 12, Ctrl = 13, Shift = 14 }
     #endregion
+
 }

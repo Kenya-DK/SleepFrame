@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 namespace SleepFrame
 {
 
@@ -54,6 +55,17 @@ namespace SleepFrame
 
                 return (centerX, centerY);
             }
+            // Method to get the top-left coordinates of the rectangle
+            public (int X, int Y) GetTopLeft()
+            {
+                return (Left, Top);
+            }
+
+            // Method to get the bottom-right coordinates of the rectangle
+            public (int X, int Y) GetBottomRight()
+            {
+                return (Right, Bottom);
+            }
         }
 
 
@@ -86,6 +98,14 @@ namespace SleepFrame
         public static Process GetWarframeProcess()
         {
             return Process.GetProcessesByName("Warframe.x64").FirstOrDefault();
+        }
+
+        public static Rect GetWarframeWindow()
+        {
+            Process bProcess = GetWarframeProcess() ?? throw new Exception("Warframe is not running");
+            Rect NotepadRect = new Rect();
+            GetWindowRect(bProcess.MainWindowHandle, ref NotepadRect);
+            return NotepadRect;
         }
 
         public static bool CheckIsWarframeIsOpen()
@@ -153,6 +173,19 @@ namespace SleepFrame
                 STAThread.Join();
 
                 return ReturnValue;
+            }
+        }
+        public static void InvokeIfRequired(this Control control, MethodInvoker action)
+        {
+            // See Update 2 for edits Mike de Klerk suggests to insert here.
+
+            if (control.InvokeRequired)
+            {
+                control.Invoke(action);
+            }
+            else
+            {
+                action();
             }
         }
     }

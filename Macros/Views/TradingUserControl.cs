@@ -1,50 +1,68 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
 namespace SleepFrame.Macros.Views
 {
     public partial class TradingUserControl : UserControl
     {
-        private Trading _trading = null;
-        public TradingUserControl(Trading trading)
+        private TradingMacro _trading = null;
+        public TradingUserControl(TradingMacro trading)
         {
             InitializeComponent();
             _trading = trading;
+
             foreach (var item in _trading.Messages)
-                _lvMessages.Items.Add(new ListViewItem(item) { Tag = item });
+                _dgvMessage.Rows.Add(item.Message, item.Enable);
         }
 
-        private void _btnRemove_Click(object sender, EventArgs e)
+        private void BtnClear_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in _lvMessages.SelectedItems)
-            {
-                _lvMessages.Items.Remove(item);
-                _trading.Messages.Remove(item.Tag.ToString());
-            }
-        }
-
-        private void _btnClear_Click(object sender, EventArgs e)
-        {
-            _lvMessages.Items.Clear();
             _trading.Messages.Clear();
+            _dgvMessage.Rows.Clear();
         }
 
-        private void _btnAdd_Click(object sender, EventArgs e)
+        private void BtnAdd_Click(object sender, EventArgs e)
         {
             if (textBox1.Text.Length > 0)
             {
-                _lvMessages.Items.Add(new ListViewItem(textBox1.Text) { Tag = textBox1.Text });
-                _trading.Messages.Add(textBox1.Text);
+                TradingMessage message = new TradingMessage(textBox1.Text, true);
+                _dgvMessage.Rows.Add(message.Message, message.Enable);
+                _trading.Messages.Add(message);
                 textBox1.Text = string.Empty;
             }
+        }
+
+        private void DgvMessage_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (_trading.Messages.Count <= e.RowIndex)
+                return;
+            switch (e.ColumnIndex)
+            {
+                case 1:
+                    TradingMessage message = _trading.Messages[e.RowIndex];
+                    if (message == null)
+                        return;
+                    message.Enable = !message.Enable;
+                    break;
+                default:
+                    break;
+            }
+            _trading.SaveToFile();
+        }
+
+        private void DgvMessage_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            TradingMessage message = _trading.Messages[e.RowIndex];
+            if (message != null)
+                message.Message = (string)_dgvMessage.Rows[e.RowIndex].Cells[0].Value;
+            _trading.SaveToFile();
+        }
+
+        private void DgvMessage_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+        {
+            if (_trading.Messages.Count <= e.RowIndex)
+                return;
+            _trading.Messages.RemoveAt(e.RowIndex);
         }
     }
 }

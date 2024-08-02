@@ -42,6 +42,7 @@
             this._niApp = new System.Windows.Forms.NotifyIcon(this.components);
             this._lblTimer = new System.Windows.Forms.Label();
             this._numNotifyTimer = new System.Windows.Forms.NumericUpDown();
+            this._chNotifyEnable = new System.Windows.Forms.CheckBox();
             this.gbStart_HotKey.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._numNotifyTimer)).BeginInit();
             this.SuspendLayout();
@@ -167,15 +168,27 @@
             // 
             this._numNotifyTimer.Location = new System.Drawing.Point(12, 52);
             this._numNotifyTimer.Name = "_numNotifyTimer";
-            this._numNotifyTimer.Size = new System.Drawing.Size(163, 20);
+            this._numNotifyTimer.Size = new System.Drawing.Size(99, 20);
             this._numNotifyTimer.TabIndex = 8;
             this._numNotifyTimer.ValueChanged += new System.EventHandler(this._numNotifyTimer_ValueChanged);
+            // 
+            // _chNotifyEnable
+            // 
+            this._chNotifyEnable.AutoSize = true;
+            this._chNotifyEnable.Location = new System.Drawing.Point(117, 53);
+            this._chNotifyEnable.Name = "_chNotifyEnable";
+            this._chNotifyEnable.Size = new System.Drawing.Size(59, 17);
+            this._chNotifyEnable.TabIndex = 9;
+            this._chNotifyEnable.Text = "Enable";
+            this._chNotifyEnable.UseVisualStyleBackColor = true;
+            this._chNotifyEnable.CheckedChanged += new System.EventHandler(this._chNotifyEnable_CheckedChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(697, 346);
+            this.Controls.Add(this._chNotifyEnable);
             this.Controls.Add(this._numNotifyTimer);
             this.Controls.Add(this._lblTimer);
             this.Controls.Add(this.gbStart_HotKey);
@@ -208,6 +221,7 @@
         private System.Windows.Forms.NotifyIcon _niApp;
         private System.Windows.Forms.Label _lblTimer;
         private System.Windows.Forms.NumericUpDown _numNotifyTimer;
+        private System.Windows.Forms.CheckBox _chNotifyEnable;
     }
 }
 

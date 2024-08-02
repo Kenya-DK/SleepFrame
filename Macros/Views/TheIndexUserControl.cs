@@ -12,7 +12,7 @@ namespace SleepFrame.Macros.Views
 {
     public partial class TheIndexUserControl : UserControl
     {
-        public TheIndexUserControl(TheIndex trading)
+        public TheIndexUserControl()
         {
             InitializeComponent();
         }

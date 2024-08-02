@@ -1,12 +1,15 @@
 ﻿using AutoHotkey.Interop;
 using MouseKeyboardLibrary;
 using Newtonsoft.Json;
+using SleepFrame.Properties;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 using static SleepFrame.Helper;
@@ -15,17 +18,20 @@ namespace SleepFrame.Macros
 {
     public class MacroBase
     {
+        #region Private Values
         private string _id;
         private string _settingsPath = "settings";
         private AutoHotkeyEngine _ahk = AutoHotkeyEngine.Instance;
         private readonly System.Timers.Timer _timer = new System.Timers.Timer(1000);
         private TimeSpan _nextInternal = TimeSpan.Zero;
         private TimeSpan _current = TimeSpan.Zero;
-        private TimeSpan _notifyTime = TimeSpan.Zero;
         private TimeSpan _internal;
+        private TimeSpan _notifyTime = new TimeSpan(0, 0, 5);
         private bool _isRunning = false;
         private bool _isPaused = false;
+        #endregion
 
+        #region Events
         public event EventHandler<string> OnProcess;
 
         public event EventHandler<string> OnStart;
@@ -35,12 +41,45 @@ namespace SleepFrame.Macros
         public event EventHandler<string> OnUpdateStatus;
 
         public event EventHandler<Tuple<string, string, int>> OnNotify;
+        #endregion
 
-        public MacroBase(string id, TimeSpan internalTime)
+        #region New
+        /// <summary>
+        /// Creates a new generic <see cref="MacroBase"/>
+        /// </summary>
+
+        public MacroBase(string id, TimeSpan internalTime, TimeSpan notifyTime)
         {
             _id = id;
             _internal = internalTime;
             _timer.Elapsed += Timer_Elapsed;
+            _notifyTime = notifyTime;
+        }
+        #endregion
+
+        #region Method
+
+        private void SetWarframeInFocus()
+        {
+            // Get the Warframe process
+            Process bProcess = GetWarframeProcess() ?? throw new Exception("Warframe is not running");
+
+            // Get the Warframe window rect and center
+            Rect NotepadRect = GetWarframeWindow();
+            var (X, Y) = NotepadRect.GetCenter();
+
+            // Set the Warframe process to the foreground
+            SetProcessToForeground(bProcess);
+            Thread.Sleep(GetRandomDelay(50, 100));
+
+            // Set The Cursor Position on Warframe
+            Cursor.Position = new System.Drawing.Point(GetRandomDelay(X - 100, X + 100), GetRandomDelay(Y - 100, Y + 100));
+
+            // Wait for the cursor to move
+            Thread.Sleep(GetRandomDelay(250, 500));
+
+            // Click on the Warframe window
+            MouseSimulator.Click(MouseButtons.Left);
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -50,26 +89,17 @@ namespace SleepFrame.Macros
             if (!_isRunning && (_current == TimeSpan.Zero || _nextInternal <= _current))
             {
                 _isRunning = true;
-                Process bProcess = GetWarframeProcess() ?? throw new Exception("Warframe is not running");
-                Rect NotepadRect = new Rect();
-                GetWindowRect(bProcess.MainWindowHandle, ref NotepadRect);
-                var (X, Y) = NotepadRect.GetCenter();
+                SetWarframeInFocus();
 
-                Process activeProcess = Helper.GetActiveProcess();
+                Process activeProcess = GetActiveProcess();
                 var cPos = Cursor.Position;
-
-                Helper.SetProcessToForeground(bProcess);
-                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
-
-                // Set The Cursor Position on Warframe
-                Cursor.Position = new System.Drawing.Point(GetRandomDelay(X - 100, X + 100), GetRandomDelay(Y - 100, Y + 100));
-                System.Threading.Thread.Sleep(GetRandomDelay(250, 500));
 
                 MouseSimulator.Click(MouseButtons.Left);
                 _ahk.ExecRaw($"BlockInput ON");
-                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
+                Thread.Sleep(GetRandomDelay(50, 100));
                 Run();
-                System.Threading.Thread.Sleep(GetRandomDelay(50, 100));
+                Thread.Sleep(GetRandomDelay(50, 100));
+                // Restore the cursor position and the active process
                 Cursor.Position = cPos;
                 SetProcessToForeground(activeProcess);
                 _ahk.ExecRaw($"BlockInput OFF");
@@ -82,20 +112,14 @@ namespace SleepFrame.Macros
                 return;
             _current = _current.Add(new TimeSpan(0, 0, 1));
 
-            if (_nextInternal.Subtract(_current) == _notifyTime)
+            if (_nextInternal.Subtract(_current) == _notifyTime && _notifyTime > TimeSpan.Zero)
                 OnNotify?.Invoke(this, new Tuple<string, string, int>("SleepFrame", "Next run in " + _nextInternal.Subtract(_current).ToString(), 250));
 
             OnProcess?.Invoke(this, $"Next run in {_nextInternal.Subtract(_current)}");
         }
+        #endregion
 
-        /// <summary>
-        /// Gets the internal TimeSpan value.
-        /// </summary>
-        public TimeSpan Internal
-        {
-            get { return _internal; }
-        }
-
+        #region Virtual Override
         /// <summary>
         /// Runs the macro. This method should be overridden in a derived class.
         /// </summary>
@@ -103,41 +127,24 @@ namespace SleepFrame.Macros
         {
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Initializes the macro.
-        /// This method is virtual and does not perform any operations by default.
-        /// It should be overridden in derived classes to perform any necessary initialization before the macro is used.
-        /// </summary>
-        public virtual void Initialize()
-        {
-        }
-
-        /// <summary>
-        /// Uninitializes the macro.
-        /// This method is virtual and does not perform any operations by default.
-        /// It should be overridden in derived classes to perform any necessary operations when the macro is no longer needed.
-        /// </summary>
-        public virtual void UnInitialize()
-        {
-        }
-
-        public virtual void LoadSettings()
-        {
-        }
-
-        public T GetSettings<T>() where T : class
+        public virtual void SaveToFile()
         {
             if (!Directory.Exists(_settingsPath))
                 Directory.CreateDirectory(_settingsPath);
-            if (!File.Exists(Path.Combine(_settingsPath, _id + ".json")))
-                return null;
-            return JsonConvert.DeserializeObject<T>(File.ReadAllText(Path.Combine(_settingsPath, _id + ".json")));
+            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(Path.Combine(_settingsPath, _id + ".json"), json);
         }
-
-        public virtual void SaveSettings<T>(T settings)
+        public virtual string LoadFromFile()
         {
-            File.WriteAllText(Path.Combine(_settingsPath, _id + ".json"), JsonConvert.SerializeObject(settings));
+            string path = Path.Combine(_settingsPath, _id + ".json");
+            if (!Directory.Exists(_settingsPath))
+                Directory.CreateDirectory(_settingsPath);
+            if (!File.Exists(path))
+                return null;
+            string json = File.ReadAllText(path);
+            MacroBase macro = JsonConvert.DeserializeObject<MacroBase>(json);
+            _notifyTime = macro.NotifyTime;
+            return path;
         }
         /// <summary>
         /// Gets the view for the macro. This method should be overridden in a derived class.
@@ -147,7 +154,6 @@ namespace SleepFrame.Macros
         {
             throw new NotImplementedException();
         }
-
         /// <summary>
         /// Starts the macro. This method triggers the OnProcess and OnStart events and starts the timer.
         /// </summary>
@@ -170,51 +176,56 @@ namespace SleepFrame.Macros
             OnStop?.Invoke(this, "");
             OnProcess?.Invoke(this, "Idle");
         }
-
-        /// <summary>
-        /// Pauses the macro execution by setting the '_isPaused' flag to true.
-        /// </summary>
-        public void Pause()
-        {
-            _isPaused = true;
-        }
-
-        /// <summary>
-        /// Resumes the macro execution by setting the '_isPaused' flag to false.
-        /// </summary>
-        public void Resume()
-        {
-            _isPaused = false;
-        }
-
-        /// <summary>
-        /// Updates the status and triggers the OnUpdateStatus event.
-        /// </summary>
-        /// <param name="status">The new status to set.</param>
-        public void UpdateStatus(string status)
-        {
-            OnUpdateStatus?.Invoke(this, status);
-        }
+        #endregion
 
         #region Method Get Set
         /// <summary>
-        /// Gets or sets the messages to send.
+        /// Gets the internal TimeSpan value.
         /// </summary>
-        /// <remarks>
-        ///  This is the message that will be sent to the chat.
-        /// </remarks>
-        public TimeSpan NotifyTimer
+        [JsonIgnore]
+        public TimeSpan Internal
         {
-            get { return _notifyTime; }
-            set { _notifyTime = value; }
+            get { return _internal; }
         }
 
+        /// <summary>
+        /// Gets the next internal TimeSpan value.
+        /// </summary>
+        /// <value>The next internal.</value>
+        [JsonIgnore]
+        public TimeSpan NextInternal
+        {
+            get { return _nextInternal; }
+        }
+
+        /// <summary>
+        /// Gets the current TimeSpan value.
+        /// </summary>
+        [JsonIgnore]
+        public TimeSpan Current
+        {
+            get { return _current; }
+        }
+
+        /// <summary>
+        /// Gets the AHK value.
+        /// </summary>
+        [JsonIgnore]
         public AutoHotkeyEngine Ahk
         {
             get { return _ahk; }
             set { _ahk = value; }
         }
-        #endregion
 
+        /// <summary>
+        /// Gets the notify time TimeSpan value.
+        /// </summary>
+        [JsonProperty("notify_time")]
+        public TimeSpan NotifyTime
+        {
+            get { return _notifyTime; }
+            set { _notifyTime = value; }
+        }
+        #endregion
     }
 }

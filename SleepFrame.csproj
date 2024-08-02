@@ -64,8 +64,7 @@
   <ItemGroup>
     <Compile Include="EELogProcessor.cs" />
     <Compile Include="Macros\MacroBase.cs" />
-    <Compile Include="Macros\TheIndex.cs" />
-    <Compile Include="Macros\Trading.cs" />
+    <Compile Include="Macros\TradingMacro.cs" />
     <Compile Include="Macros\UserControls.cs" />
     <Compile Include="Macros\Views\TheIndexUserControl.cs">
       <SubType>UserControl</SubType>
