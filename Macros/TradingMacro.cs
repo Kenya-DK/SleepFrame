@@ -35,6 +35,7 @@ namespace SleepFrame.Macros
         public TradingMacro() : base("trading", new TimeSpan(0, 2, 0), new TimeSpan(0, 0, 5))
         {
             _messages.CollectionChanged += OnMessagesChanged;
+            base.SetFocus = true;
         }
 
         #endregion

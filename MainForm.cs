@@ -38,7 +38,7 @@ namespace SleepFrame
         {
             Event(false);
             _chMacros.Items.Add(new ComboBoxItem("Trading", null, new TradingMacro()));
-            //_chMacros.Items.Add(new ComboBoxItem<TheIndex>("The Index", null, new TheIndex()));
+            _chMacros.Items.Add(new ComboBoxItem("The Index", null, new TheIndexMacro()));
             //_chMacros.Items.Add(new ComboBoxItem<NightwaveSkip>("Nightwave Skip", null, new NightwaveSkip()));
             cbKeyToo.DataSource = Enum.GetValues(typeof(MouseShortcut));
             cbKeyOn.DataSource = Enum.GetValues(typeof(MouseShortcut2));
@@ -235,7 +235,7 @@ namespace SleepFrame
         private void _numNotifyTimer_ValueChanged(object sender, EventArgs e)
         {
             if (currentMacro == null) return;
-            currentMacro.NotifyTime= new TimeSpan(0, 0, (int)_numNotifyTimer.Value);
+            currentMacro.NotifyTime = new TimeSpan(0, 0, (int)_numNotifyTimer.Value);
             currentMacro.SaveToFile();
         }
 
@@ -245,6 +245,12 @@ namespace SleepFrame
             _numNotifyTimer.Enabled = _chNotifyEnable.Checked;
             currentMacro.NotifyTime = _chNotifyEnable.Checked ? new TimeSpan(0, 0, (int)_numNotifyTimer.Value) : TimeSpan.Zero;
             currentMacro.SaveToFile();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            RecordDialog rd = new RecordDialog(new List<Point>());
+            rd.Show();
         }
     }
     #region Enum

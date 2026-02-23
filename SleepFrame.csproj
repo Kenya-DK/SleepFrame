@@ -63,7 +63,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EELogProcessor.cs" />
+    <Compile Include="GUI\ArrowDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ArrowDlg.Designer.cs">
+      <DependentUpon>ArrowDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\RecordDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\RecordDialog.Designer.cs">
+      <DependentUpon>RecordDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Macros\MacroBase.cs" />
+    <Compile Include="Macros\TheIndexMacro.cs" />
     <Compile Include="Macros\TradingMacro.cs" />
     <Compile Include="Macros\UserControls.cs" />
     <Compile Include="Macros\Views\TheIndexUserControl.cs">
@@ -89,6 +102,12 @@
     <Compile Include="Model\Hotkey.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GUI\ArrowDlg.resx">
+      <DependentUpon>ArrowDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\RecordDialog.resx">
+      <DependentUpon>RecordDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Macros\Views\TheIndexUserControl.resx">
       <DependentUpon>TheIndexUserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -128,5 +147,6 @@
     <None Include="Resources\app_icon_on.ico" />
     <None Include="app_icon_on.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

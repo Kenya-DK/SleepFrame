@@ -29,6 +29,9 @@ namespace SleepFrame.Macros
         private TimeSpan _notifyTime = new TimeSpan(0, 0, 5);
         private bool _isRunning = false;
         private bool _isPaused = false;
+        private bool _setFocus = false;
+        private int _randomMaxInternalMs = 0;
+        private int _randomMinInternalMs = 0;
         #endregion
 
         #region Events
@@ -88,8 +91,10 @@ namespace SleepFrame.Macros
                 return;
             if (!_isRunning && (_current == TimeSpan.Zero || _nextInternal <= _current))
             {
+                Console.WriteLine("Run");
                 _isRunning = true;
-                SetWarframeInFocus();
+                if (SetFocus)
+                    SetWarframeInFocus();
 
                 Process activeProcess = GetActiveProcess();
                 var cPos = Cursor.Position;
@@ -116,6 +121,53 @@ namespace SleepFrame.Macros
                 OnNotify?.Invoke(this, new Tuple<string, string, int>("SleepFrame", "Next run in " + _nextInternal.Subtract(_current).ToString(), 250));
 
             OnProcess?.Invoke(this, $"Next run in {_nextInternal.Subtract(_current)}");
+            // Random rnd = new Random();
+            // if (_isPaused)
+            //     return;
+            // if (!_isRunning && (_current == TimeSpan.Zero || _nextInternal <= _current))
+            // {
+            //     _isRunning = true;
+            //     if (_setFocus)
+            //     {
+            //         SetWarframeInFocus();
+            //         Process activeProcess = GetActiveProcess();
+            //         var cPos = Cursor.Position;
+
+            //         MouseSimulator.Click(MouseButtons.Left);
+            //         _ahk.ExecRaw($"BlockInput ON");
+            //         Thread.Sleep(GetRandomDelay(50, 100));
+            //         Run();
+            //         Thread.Sleep(GetRandomDelay(50, 100));
+            //         // Restore the cursor position and the active process
+            //         Cursor.Position = cPos;
+            //         SetProcessToForeground(activeProcess);
+
+            //     }
+            //     else
+            //     {
+            //         _ahk.ExecRaw($"BlockInput ON");
+            //         Thread.Sleep(GetRandomDelay(50, 100));
+            //         Run();
+            //         Thread.Sleep(GetRandomDelay(50, 100));
+            //         _ahk.ExecRaw($"BlockInput ON");
+            //     }
+            //     _ahk.ExecRaw($"BlockInput OFF");
+
+            //     _nextInternal = _nextInternal.Add(_internal);
+
+            //     //if (_randomMaxInternalMs >= 0)
+            //     //    _nextInternal += new TimeSpan(0, 0, 0, 0, rnd.Next(_randomMinInternalMs, _randomMaxInternalMs));
+            //     _isRunning = false;
+            // }
+
+            // if (_isRunning)
+            //     return;
+            // _current = _current.Add(new TimeSpan(0, 0, 1));
+
+            // if (_nextInternal.Subtract(_current) == _notifyTime && _notifyTime > TimeSpan.Zero)
+            //     OnNotify?.Invoke(this, new Tuple<string, string, int>("SleepFrame", "Next run in " + _nextInternal.Subtract(_current).ToString(), 250));
+
+            // OnProcess?.Invoke(this, $"Next run in {_nextInternal.Subtract(_current)}");
         }
         #endregion
 
@@ -225,6 +277,36 @@ namespace SleepFrame.Macros
         {
             get { return _notifyTime; }
             set { _notifyTime = value; }
+        }
+        /// <summary>
+        /// Gets the SetFocus value.
+        /// </summary>
+        [JsonIgnore]
+        public bool SetFocus
+        {
+            get { return _setFocus; }
+            set { _setFocus = value; }
+        }
+
+        /// <summary>
+        /// Gets the random max internal value in milliseconds.
+        /// </summary>
+        /// <value>The random max internal value.</value>
+        [JsonIgnore]
+        public int RandomMaxInternal
+        {
+            get { return _randomMaxInternalMs; }
+            set { _randomMaxInternalMs = value; }
+        }
+        /// <summary>
+        /// Gets the random min internal value in milliseconds.
+        /// </summary>
+        /// <value>The random min internal value.</value>
+        [JsonIgnore]
+        public int RandomMinInternal
+        {
+            get { return _randomMinInternalMs; }
+            set { _randomMinInternalMs = value; }
         }
         #endregion
     }

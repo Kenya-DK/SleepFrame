@@ -43,6 +43,7 @@
             this._lblTimer = new System.Windows.Forms.Label();
             this._numNotifyTimer = new System.Windows.Forms.NumericUpDown();
             this._chNotifyEnable = new System.Windows.Forms.CheckBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.gbStart_HotKey.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._numNotifyTimer)).BeginInit();
             this.SuspendLayout();
@@ -183,6 +184,16 @@
             this._chNotifyEnable.UseVisualStyleBackColor = true;
             this._chNotifyEnable.CheckedChanged += new System.EventHandler(this._chNotifyEnable_CheckedChanged);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(156, 107);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(164, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Start";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -196,6 +207,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._chMacros);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this._btnStartOrStop);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -222,6 +234,7 @@
         private System.Windows.Forms.Label _lblTimer;
         private System.Windows.Forms.NumericUpDown _numNotifyTimer;
         private System.Windows.Forms.CheckBox _chNotifyEnable;
+        private System.Windows.Forms.Button button1;
     }
 }
 
