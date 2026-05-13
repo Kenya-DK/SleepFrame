@@ -1,7 +1,6 @@
 ﻿using MouseKeyboardLibrary;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SleepFrame.Macros
@@ -10,8 +9,7 @@ namespace SleepFrame.Macros
     {
         #region Private Values
         private TimeSpan _lastOpraterMode = TimeSpan.Zero;
-        private Task _protectiveSling;
-        private Task _opRaterMode;
+        private CancellationTokenSource _cts;
         #endregion
 
         #region Events
@@ -50,31 +48,31 @@ namespace SleepFrame.Macros
         {
             Random rnd = new Random();
 
-            // Go to Oprater Mode
-            // If last oprater mode was more than Random(10,15) seconds ago
-            if (DateTime.Now.TimeOfDay - _lastOpraterMode > TimeSpan.FromSeconds(10 + rnd.Next(0, 5)))
+            while (!_cts.Token.IsCancellationRequested)
             {
-                _lastOpraterMode = DateTime.Now.TimeOfDay;
-                OpraterMode();
-                Thread.Sleep(500 + rnd.Next(0, 300));
-                OpraterMode();
+                // Go to Oprater Mode every 15-20 seconds
+                if (DateTime.Now.TimeOfDay - _lastOpraterMode > TimeSpan.FromSeconds(15 + rnd.Next(0, 5)))
+                {
+                    _lastOpraterMode = DateTime.Now.TimeOfDay;
+                    OpraterMode();
+                    Thread.Sleep(500 + rnd.Next(0, 300));
+                    OpraterMode();
+                }
+
+                // Run ProtectiveSling then wait 3-4.5 seconds before running again
+                ProtectiveSling();
+                _cts.Token.WaitHandle.WaitOne(2500 + rnd.Next(0, 1500));
             }
-            // Move mouse to screen coordinates
-            _protectiveSling = Task.Run(ProtectiveSling);
+        }
+        public override void Start()
+        {
+            _cts = new CancellationTokenSource();
+            base.Start();
         }
         public override void Stop()
         {
+            _cts?.Cancel();
             base.Stop();
-            if (_protectiveSling != null)
-            {
-                _protectiveSling.Wait();
-                _protectiveSling.Dispose();
-            }
-            if (_opRaterMode != null)
-            {
-                _opRaterMode.Wait();
-                _opRaterMode.Dispose();
-            }
         }
         #endregion
 

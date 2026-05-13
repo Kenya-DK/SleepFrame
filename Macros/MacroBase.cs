@@ -100,14 +100,14 @@ namespace SleepFrame.Macros
                 var cPos = Cursor.Position;
 
                 MouseSimulator.Click(MouseButtons.Left);
-                _ahk.ExecRaw($"BlockInput ON");
+                //_ahk.ExecRaw($"BlockInput ON");
                 Thread.Sleep(GetRandomDelay(50, 100));
                 Run();
                 Thread.Sleep(GetRandomDelay(50, 100));
                 // Restore the cursor position and the active process
                 Cursor.Position = cPos;
                 SetProcessToForeground(activeProcess);
-                _ahk.ExecRaw($"BlockInput OFF");
+                //_ahk.ExecRaw($"BlockInput OFF");
                 _nextInternal = _nextInternal.Add(_internal);
 
                 _isRunning = false;
