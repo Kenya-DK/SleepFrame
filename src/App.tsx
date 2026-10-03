@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { check as checkUpdate, type Update } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 import * as api from "./api";
 import type { NodeSpec, StateDto } from "./types";
@@ -19,6 +21,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
+  const [update, setUpdate] = useState<Update | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -65,6 +69,37 @@ export default function App() {
       unlisten.forEach((handler) => handler());
     };
   }, [refresh]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const found = await checkUpdate();
+        if (!cancelled && found) {
+          setUpdate(found);
+        }
+      } catch {
+        // Updater unavailable (e.g. in dev) — ignore.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const installUpdate = async () => {
+    if (!update) {
+      return;
+    }
+    setUpdating(true);
+    try {
+      await update.downloadAndInstall();
+      await relaunch();
+    } catch (cause) {
+      setError(String(cause));
+      setUpdating(false);
+    }
+  };
 
   const run = useCallback(
     async (action: () => Promise<unknown>) => {
@@ -216,6 +251,24 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {update && (
+        <div className="flex items-center justify-between gap-3 border-b border-gold-500/40 bg-gold-500/10 px-5 py-2 text-xs text-gold-200">
+          <span className="min-w-0 truncate">
+            Update available:{" "}
+            <span className="font-mono">{update.version}</span>
+            {update.body ? ` — ${update.body}` : ""}
+          </span>
+          <button
+            type="button"
+            onClick={installUpdate}
+            disabled={updating}
+            className="btn-primary shrink-0 px-3 py-1 text-xs"
+          >
+            {updating ? "Installing…" : "Install & restart"}
+          </button>
+        </div>
+      )}
 
       <div className="flex min-h-0 flex-1">
         <Sidebar

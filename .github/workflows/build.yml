@@ -35,9 +35,11 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional: only needed if you enable Tauri updater signing.
-          # TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          # TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          # Required for the in-app updater (signs the update artifacts).
+          # Add these repository secrets: TAURI_PRIVATE_KEY and
+          # TAURI_PRIVATE_KEY_PASSWORD (leave the password empty if unset).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__ # the action replaces __VERSION__ with the app version
           releaseName: "SleepFrame v__VERSION__"
