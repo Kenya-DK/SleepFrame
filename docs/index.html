@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SleepFrame — How-to Wiki</title>
+    <meta
+      name="description"
+      content="How to install, build and use SleepFrame — a node-based macro studio for Warframe."
+    />
+    <style>
+      :root {
+        --bg: #06070b;
+        --bg-2: #0f121b;
+        --panel: #141824;
+        --border: #1d2231;
+        --border-2: #2a3145;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --dim: #64748b;
+        --gold: #d4a537;
+        --gold-2: #e7c46c;
+        --sky: #38bdf8;
+        --pink: #f472b6;
+        --green: #34d399;
+        --violet: #a78bfa;
+        --red: #fb7185;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1200px 600px at 85% -10%, rgba(212, 165, 55, 0.12), transparent 55%),
+          radial-gradient(900px 500px at 0% 110%, rgba(59, 130, 246, 0.08), transparent 55%),
+          var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+      }
+      a { color: var(--gold-2); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      code, pre, kbd {
+        font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      }
+      code {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1px 6px;
+        font-size: 0.85em;
+        color: var(--gold-2);
+      }
+      pre {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+        overflow: auto;
+        font-size: 13px;
+      }
+      pre code { background: none; border: none; padding: 0; color: var(--text); }
+      kbd {
+        background: var(--panel);
+        border: 1px solid var(--border-2);
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        padding: 1px 6px;
+        font-size: 0.8em;
+      }
+
+      header.hero {
+        border-bottom: 1px solid var(--border);
+        padding: 48px 24px 32px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .brand { display: flex; align-items: center; gap: 14px; }
+      .logo {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: grid; place-items: center;
+        background: rgba(212, 165, 55, 0.12);
+        border: 1px solid rgba(212, 165, 55, 0.4);
+        font-size: 22px;
+      }
+      h1 { font-size: 30px; margin: 0; letter-spacing: 0.3px; }
+      .tag { color: var(--dim); text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; }
+      .lead { color: var(--muted); max-width: 720px; margin-top: 16px; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+      .pill {
+        font-size: 12px; color: var(--muted);
+        border: 1px solid var(--border-2); border-radius: 999px;
+        padding: 4px 12px; background: var(--panel);
+      }
+
+      .wrap {
+        max-width: 1200px; margin: 0 auto;
+        display: grid; grid-template-columns: 240px 1fr; gap: 32px;
+        padding: 32px 24px 96px;
+        align-items: start;
+      }
+      nav.toc {
+        position: sticky; top: 24px;
+        border: 1px solid var(--border);
+        background: rgba(15, 18, 27, 0.7);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      nav.toc h4 {
+        margin: 0 0 10px; font-size: 11px; letter-spacing: 0.18em;
+        text-transform: uppercase; color: var(--dim);
+      }
+      nav.toc a {
+        display: block; color: var(--muted); padding: 5px 8px;
+        border-radius: 8px; font-size: 13px;
+      }
+      nav.toc a:hover { background: var(--panel); color: var(--text); text-decoration: none; }
+
+      main { min-width: 0; }
+      section {
+        border: 1px solid var(--border);
+        background: rgba(20, 24, 36, 0.5);
+        border-radius: 18px;
+        padding: 24px 26px;
+        margin-bottom: 22px;
+        scroll-margin-top: 20px;
+      }
+      section h2 {
+        margin: 0 0 14px; font-size: 20px;
+        display: flex; align-items: center; gap: 10px;
+      }
+      section h3 { margin: 22px 0 8px; font-size: 15px; color: var(--gold-2); }
+      section p, section li { color: var(--muted); }
+      section strong { color: var(--text); }
+      ul { padding-left: 20px; }
+      li { margin: 4px 0; }
+      .kicker {
+        font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em;
+        color: var(--dim); margin: 0 0 6px;
+      }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+      .card {
+        border: 1px solid var(--border-2); border-radius: 12px;
+        background: var(--bg-2); padding: 14px 16px;
+      }
+      .card h4 { margin: 0 0 6px; font-size: 14px; color: var(--text); }
+      .card p { margin: 0; font-size: 13px; }
+      .dot { width: 9px; height: 9px; border-radius: 999px; display: inline-block; }
+      .c-trigger { background: var(--green); }
+      .c-input { background: var(--sky); }
+      .c-timing { background: #fbbf24; }
+      .c-flow { background: var(--violet); }
+      .c-method { background: var(--pink); }
+      .c-output { background: var(--red); }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+      th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+      th { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+      td code { white-space: nowrap; }
+      .note {
+        border-left: 3px solid var(--gold); background: rgba(212, 165, 55, 0.08);
+        border-radius: 8px; padding: 12px 16px; margin: 14px 0;
+      }
+      .note.warn { border-color: var(--red); background: rgba(251, 113, 133, 0.08); }
+      .note.ok { border-color: var(--green); background: rgba(52, 211, 153, 0.08); }
+      .note p { margin: 0; }
+      footer {
+        border-top: 1px solid var(--border);
+        color: var(--dim); font-size: 12px;
+        max-width: 1200px; margin: 0 auto; padding: 24px;
+      }
+      @media (max-width: 880px) {
+        .wrap { grid-template-columns: 1fr; }
+        nav.toc { position: static; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#e7c46c" aria-hidden="true">
+            <path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z" />
+          </svg>
+        </div>
+        <div>
+          <h1>SleepFrame</h1>
+          <div class="tag">How-to wiki</div>
+        </div>
+      </div>
+      <p class="lead">
+        SleepFrame is a desktop automation companion for Warframe. Build macros visually
+        in an n8n-style node editor, reuse methods, and share your macros with others.
+        This page covers installing, building, and using it.
+      </p>
+      <div class="pill-row">
+        <span class="pill">Rust + Tauri</span>
+        <span class="pill">React + Tailwind</span>
+        <span class="pill">Windows</span>
+        <span class="pill">Node editor</span>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <nav class="toc">
+        <h4>Contents</h4>
+        <a href="#start">Getting started</a>
+        <a href="#interface">The interface</a>
+        <a href="#building">Building a macro</a>
+        <a href="#nodes">Node reference</a>
+        <a href="#methods">Reusable methods</a>
+        <a href="#condition">Condition modes</a>
+        <a href="#pickers">Pickers (window / region)</a>
+        <a href="#focus">Focus window</a>
+        <a href="#ocr">Read text (OCR)</a>
+        <a href="#sharing">Sharing &amp; importing</a>
+        <a href="#hotkey">Hotkey &amp; tray</a>
+        <a href="#faq">Troubleshooting</a>
+      </nav>
+
+      <main>
+        <section id="start">
+          <h2>Getting started</h2>
+          <p class="kicker">Requirements</p>
+          <ul>
+            <li><a href="https://nodejs.org/">Node.js</a> 20+</li>
+            <li><a href="https://www.rust-lang.org/tools/install">Rust</a> (stable)</li>
+            <li>WebView2 (preinstalled on Windows 10/11)</li>
+          </ul>
+          <h3>Run in development</h3>
+          <pre><code>npm install
+npm run tauri dev</code></pre>
+          <h3>Build a release</h3>
+          <pre><code>npm run tauri build</code></pre>
+          <p>Installers and binaries are written to <code>src-tauri/target/release/bundle</code>.</p>
+          <div class="note">
+            <p>
+              Settings and your macros are stored in
+              <code>%APPDATA%\com.sleepframe.app\settings</code>.
+            </p>
+          </div>
+        </section>
+
+        <section id="interface">
+          <h2>The interface</h2>
+          <ul>
+            <li><strong>Sidebar</strong> — your <em>Macros</em> and reusable <em>Methods</em>, the global hotkey, and Share/Import.</li>
+            <li><strong>Canvas</strong> — the node graph for the selected macro. Click a macro to open it.</li>
+            <li><strong>Right panel</strong> — configure the selected node (or the macro itself when nothing is selected).</li>
+          </ul>
+          <h3>Canvas controls</h3>
+          <table>
+            <tr><th>Action</th><th>How</th></tr>
+            <tr><td>Pan</td><td>Hold the <strong>middle mouse button</strong> and drag.</td></tr>
+            <tr><td>Zoom</td><td><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + scroll, or the <strong>−/%/+</strong> control (bottom-right).</td></tr>
+            <tr><td>Reset zoom</td><td>Click the percentage readout.</td></tr>
+            <tr><td>Select</td><td>Click a node. <kbd>Ctrl</kbd>/<kbd>Shift</kbd>-click to add.</td></tr>
+            <tr><td>Rubber-band select</td><td>Drag on empty canvas (Ctrl/Shift to add).</td></tr>
+            <tr><td>Move group</td><td>Drag any selected node.</td></tr>
+            <tr><td>Duplicate</td><td><kbd>Ctrl</kbd>+<kbd>D</kbd> or the Duplicate button.</td></tr>
+            <tr><td>Delete</td><td><kbd>Delete</kbd> or the Delete button.</td></tr>
+            <tr><td>Clear selection</td><td><kbd>Esc</kbd>.</td></tr>
+          </table>
+        </section>
+
+        <section id="building">
+          <h2>Building a macro</h2>
+          <ol>
+            <li>Pick a macro in the sidebar (or create a new one) and press <strong>Run</strong> / <strong>Start</strong>.</li>
+            <li>Click <strong>+ Add node</strong> to open the palette. Use the <strong>Search nodes…</strong> box to filter.</li>
+            <li>Click an output port on the right of a node, then click another node to connect them. Click the small <strong>×</strong> on a link to remove it.</li>
+            <li>Every node has an input (left) and one or more outputs (right). Flow nodes like <em>Condition</em> and <em>Repeat</em> have extra outputs.</li>
+            <li>Drag one output to several nodes to run them as <strong>parallel branches</strong>.</li>
+          </ol>
+          <div class="note ok">
+            <p>Every macro starts from its <strong>Start</strong> node and follows the connections.</p>
+          </div>
+        </section>
+
+        <section id="nodes">
+          <h2>Node reference</h2>
+
+          <h3><span class="dot c-trigger"></span> Triggers</h3>
+          <div class="grid">
+            <div class="card"><h4>Start</h4><p>Entry point of the macro. There should be exactly one.</p></div>
+            <div class="card"><h4>End</h4><p>Stops this branch of the workflow.</p></div>
+          </div>
+
+          <h3><span class="dot c-input"></span> Inputs</h3>
+          <div class="grid">
+            <div class="card"><h4>Focus window</h4><p>Brings a window to the foreground, nudges the cursor and clicks once. See <a href="#focus">Focus window</a>.</p></div>
+            <div class="card"><h4>Key down / Key up</h4><p>Holds or releases a key or shortcut. Accepts combos like <code>Ctrl+Shift</code>.</p></div>
+            <div class="card"><h4>Press key</h4><p>Presses and releases a key once. Accepts combos like <code>Ctrl+Space</code>.</p></div>
+            <div class="card"><h4>Shortcut</h4><p>Fires a full key combination in one go, e.g. <code>Alt+F4</code>. Has a record button.</p></div>
+            <div class="card"><h4>Hold key</h4><p>Key down + wait + key up in one node, with a randomised hold duration.</p></div>
+            <div class="card"><h4>Type text</h4><p>Types a literal string. Supports the <code>{{ocr}}</code> placeholder.</p></div>
+            <div class="card"><h4>Send messages</h4><p>Types the next entry from an editable list of strings (sequential or random).</p></div>
+            <div class="card"><h4>Click / Double click</h4><p>Clicks a mouse button once, or double-clicks it.</p></div>
+            <div class="card"><h4>Move mouse</h4><p>Moves the cursor to a point or near the Warframe window centre. Has a position picker.</p></div>
+          </div>
+
+          <h3><span class="dot c-timing"></span> Timing</h3>
+          <div class="grid">
+            <div class="card"><h4>Wait</h4><p>Waits a randomised time. Enable <em>Countdown</em> to show and notify a “next run” timer.</p></div>
+          </div>
+
+          <h3><span class="dot c-flow"></span> Flow</h3>
+          <div class="grid">
+            <div class="card"><h4>Condition</h4><p>Routes execution based on a mode. See <a href="#condition">Condition modes</a>.</p></div>
+            <div class="card"><h4>Repeat</h4><p>Repeats the connected body. <em>Times</em> <code>0</code> = forever; add an interval to repeat every X time.</p></div>
+          </div>
+
+          <h3><span class="dot c-method"></span> Methods</h3>
+          <div class="grid">
+            <div class="card"><h4>Call method</h4><p>Runs one of your reusable methods.</p></div>
+            <div class="card"><h4>Method timer</h4><p>Runs a method repeatedly in the background on its own interval.</p></div>
+          </div>
+
+          <h3><span class="dot c-output"></span> Output</h3>
+          <div class="grid">
+            <div class="card"><h4>Notification</h4><p>Shows a desktop notification.</p></div>
+          </div>
+
+          <div class="note">
+            <p>Tip: any output port can have several links — they all run together as parallel branches.</p>
+          </div>
+        </section>
+
+        <section id="methods">
+          <h2>Reusable methods</h2>
+          <p>
+            Methods are named sub-graphs you can call from any macro, or run on their own timer.
+            Manage them in the <strong>Methods</strong> section of the sidebar.
+          </p>
+          <ul>
+            <li>Create a method with the inline <strong>New</strong> field; open it to edit its nodes.</li>
+            <li>In a macro, add a <strong>Call method</strong> node and pick the method, or a <strong>Method timer</strong> to run it on an interval.</li>
+            <li>Methods are shared automatically when a macro that uses them is exported.</li>
+          </ul>
+        </section>
+
+        <section id="condition">
+          <h2>Condition modes</h2>
+          <p>The Condition node asks you to pick a <strong>Mode</strong> first; each mode shows only its own settings.</p>
+          <table>
+            <tr><th>Mode</th><th>Settings</th><th>Outputs</th></tr>
+            <tr><td><strong>Warframe</strong></td><td>State: running / closed</td><td>true / false</td></tr>
+            <tr><td><strong>Nodes</strong></td><td>Nodes to watch + Match (any/all)</td><td>true / false</td></tr>
+            <tr><td><strong>OCR</strong></td><td>Compare (contains / equals / not_contains) + Value</td><td>true / false</td></tr>
+            <tr><td><strong>Switch</strong></td><td>Cases, one per output</td><td>1, 2, 3 … + else</td></tr>
+          </table>
+          <div class="note">
+            <p>
+              The <strong>OCR</strong> mode only appears when a <em>Read text (OCR)</em> node is connected into
+              the Condition node. Cases in Switch mode use the form <code>kind:argument</code>, e.g.
+              <code>ocr_contains:Heat</code> or <code>warframe_closed</code>.
+            </p>
+          </div>
+        </section>
+
+        <section id="pickers">
+          <h2>Pickers (window / region)</h2>
+          <ul>
+            <li>
+              <strong>Window picker</strong> (Focus window): press <em>Pick window</em>, then activate the target
+              window during the 3-second countdown. It records that window's process and title.
+            </li>
+            <li>
+              <strong>Region picker</strong> (Read text — OCR): press <em>Pick region</em> to open a fullscreen
+              overlay; drag a box over anything on screen. <kbd>Esc</kbd> cancels.
+            </li>
+            <li>
+              <strong>Position picker</strong> (Move mouse): press <em>Pick position</em>, then click anywhere to
+              capture that point.
+            </li>
+          </ul>
+        </section>
+
+        <section id="focus">
+          <h2>Focus window</h2>
+          <p>Brings a window to the foreground, nudges the cursor near its centre and clicks once.</p>
+          <table>
+            <tr><th>Field</th><th>Meaning</th></tr>
+            <tr><td><code>Process</code></td><td>Executable name to focus, e.g. <code>Warframe.x64</code> or <code>notepad</code>.</td></tr>
+            <tr><td><code>Window title (optional)</code></td><td>If set, matches a visible window whose title contains this text instead.</td></tr>
+          </table>
+          <p>Use the <em>Pick window</em> button to fill both automatically.</p>
+        </section>
+
+        <section id="ocr">
+          <h2>Read text (OCR)</h2>
+          <p>
+            The <strong>Read text (OCR)</strong> node captures a screen region and reads its text with a
+            bundled, pure-Rust engine (models embedded — nothing to install).
+          </p>
+          <div class="note">
+            <p>
+              It's controlled by <code>pub const OCR_ENABLED: bool = true;</code> in
+              <code>src-tauri/src/workflow.rs</code> (set it to <code>false</code> to hide the node).
+            </p>
+          </div>
+          <h3>Settings (grouped)</h3>
+          <ul>
+            <li><strong>Region</strong> — X / Y / Width / Height (with the region picker).</li>
+            <li><strong>Preprocessing</strong> — Invert (auto/on/off), Upscale, Binarize (Otsu).</li>
+            <li><strong>Colour filter</strong> — Only colour (e.g. <code>#bd2a2a</code>) + tolerance; isolates text of that colour.</li>
+            <li><strong>Characters</strong> — Only characters, e.g. <code>0123456789.%+-</code>.</li>
+            <li><strong>Model</strong> — optional local detection/recognition model paths (<code>.onnx</code>/<code>.rten</code>).</li>
+          </ul>
+          <p>
+            The result is always sent to the next nodes: read it in a Condition (OCR mode) or inject it
+            elsewhere with <code>{{ocr}}</code>. The node also shows the last recognised text.
+          </p>
+        </section>
+
+        <section id="sharing">
+          <h2>Sharing &amp; importing</h2>
+          <ol>
+            <li>Open a macro and click <strong>Share / Import macro</strong>.</li>
+            <li><strong>Export</strong> — copy the share code (includes every method the macro uses).</li>
+            <li><strong>Import</strong> — paste a share code (or raw JSON) and press <em>Import macro</em>.</li>
+          </ol>
+          <p>Imported macros are added as new macros; method id conflicts are remapped so nothing is overwritten.</p>
+        </section>
+
+        <section id="hotkey">
+          <h2>Hotkey &amp; tray</h2>
+          <ul>
+            <li>Set a <strong>global hotkey</strong> in the sidebar (modifier + key, default <kbd>F3</kbd>) to start/stop the selected macro from anywhere.</li>
+            <li>The app keeps running in the <strong>system tray</strong>; closing the window hides it. Use the tray menu to <em>Quit</em>.</li>
+            <li>Launching SleepFrame again focuses the existing window (single instance).</li>
+          </ul>
+        </section>
+
+        <section id="faq">
+          <h2>Troubleshooting</h2>
+          <h3>The macro doesn't seem to do anything</h3>
+          <ul>
+            <li>Make sure the game window is focused — add a <strong>Focus window</strong> node first.</li>
+            <li>If the game is running elevated, Windows blocks synthetic input; run the game without admin.</li>
+            <li>Run SleepFrame as administrator if your game is elevated.</li>
+          </ul>
+          <h3>Clicks don't register in-game</h3>
+          <ul>
+            <li>Clicks are held briefly to help games register them. Try focusing the window right before the click.</li>
+          </ul>
+          <h3>Where are my macros stored?</h3>
+          <p><code>%APPDATA%\com.sleepframe.app\settings</code> (built-in macros can be reset; your edits shadow the defaults).</p>
+          <h3>OCR is missing</h3>
+          <p>It's disabled by default — see the <a href="#ocr">OCR section</a> to enable it.</p>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      SleepFrame — use at your own risk. Not affiliated with Digital Extremes or Warframe.
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface-950: #06070b;
+  --color-surface-900: #0a0c12;
+  --color-surface-850: #0f121b;
+  --color-surface-800: #141824;
+  --color-surface-700: #1d2231;
+  --color-surface-600: #2a3145;
+  --color-surface-500: #3b455e;
+
+  --color-gold-300: #f2d998;
+  --color-gold-400: #e7c46c;
+  --color-gold-500: #d4a537;
+  --color-gold-600: #ab8222;
+
+  --font-mono: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular,
+    Menlo, Consolas, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(212, 165, 55, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 0% 110%, rgba(59, 130, 246, 0.08), transparent 55%),
+    var(--color-surface-950);
+  color: #e2e8f0;
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-600);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-500);
+  background-clip: content-box;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-surface-700 bg-surface-850/70 shadow-xl shadow-black/30 backdrop-blur;
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-danger,
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply bg-gold-500 text-surface-950 hover:bg-gold-400;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500;
+  }
+
+  .btn-ghost {
+    @apply border border-surface-600 bg-surface-800 text-slate-200 hover:border-surface-500 hover:bg-surface-700;
+  }
+
+  .btn-icon {
+    @apply inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-surface-600 text-slate-400 transition-colors hover:border-red-500/60 hover:text-red-400;
+  }
+
+  .input,
+  .select {
+    @apply w-full rounded-lg border border-surface-600 bg-surface-900/80 px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-gold-500/70;
+  }
+
+  .select {
+    @apply cursor-pointer appearance-none pr-8;
+  }
+
+  .label {
+    @apply text-xs font-semibold uppercase tracking-widest text-slate-500;
+  }
+}
