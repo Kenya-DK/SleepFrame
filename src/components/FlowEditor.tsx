@@ -29,6 +29,8 @@ type FlowDoc = Workflow | Method;
 const NODE_W = 250;
 const NODE_H = 96;
 const HEADER = 40;
+// Spacing of the dotted canvas background; connections snap to it.
+const GRID = 22;
 const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 2.5;
 
@@ -105,6 +107,7 @@ export function FlowEditor({
 
   const [zoom, setZoom] = useState(1);
   const [panning, setPanning] = useState(false);
+  const [hoveredConnection, setHoveredConnection] = useState<number | null>(null);
   const [timers, setTimers] = useState<Record<string, number>>({});
   const [ocrTexts, setOcrTexts] = useState<Record<string, string>>({});
   const [regionTarget, setRegionTarget] = useState<string | null>(null);
@@ -243,8 +246,8 @@ export function FlowEditor({
       id: uid(spec.kind),
       kind: spec.kind,
       name: spec.label,
-      x: 120 + (count % 3) * 300,
-      y: 180 + Math.floor(count / 3) * 170,
+      x: 110 + (count % 3) * 220,
+      y: 176 + Math.floor(count / 3) * 176,
       params,
     };
     mutate({ nodes: [...nodes, node] });
@@ -299,8 +302,9 @@ export function FlowEditor({
         return {
           ...node,
           id: newId,
-          x: node.x + 28,
-          y: node.y + 28,
+          // One grid step diagonal, so copies stay laid on the grid.
+          x: node.x + GRID,
+          y: node.y + GRID,
           params: JSON.parse(JSON.stringify(node.params)) as Record<string, unknown>,
         };
       });
@@ -460,10 +464,18 @@ export function FlowEditor({
     }
     const dx = (event.clientX - current.sx) / zoom;
     const dy = (event.clientY - current.sy) / zoom;
+    // Live snap to the dot grid (n8n-style) so nodes stay laid on the grid.
+    const snap = (value: number) => Math.round(value / GRID) * GRID;
     updateNodes((list) =>
       list.map((node) => {
         const origin = current.origin[node.id];
-        return origin ? { ...node, x: origin.x + dx, y: origin.y + dy } : node;
+        return origin
+          ? {
+              ...node,
+              x: snap(origin.x + dx),
+              y: snap(origin.y + dy),
+            }
+          : node;
       }),
     );
   };
@@ -826,6 +838,16 @@ export function FlowEditor({
                 >
                   <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
                 </marker>
+                <marker
+                  id="arrow-hover"
+                  markerWidth="10"
+                  markerHeight="10"
+                  refX="8"
+                  refY="3"
+                  orient="auto"
+                >
+                  <path d="M0,0 L0,6 L9,3 z" fill="#d4a537" />
+                </marker>
               </defs>
               {connections.map((connection, index) => {
                 const from = nodes.find((node) => node.id === connection.from);
@@ -838,33 +860,57 @@ export function FlowEditor({
                 const y1 = from.y + outputY(portIndex, outputs.length);
                 const x2 = to.x;
                 const y2 = to.y + NODE_H / 2;
+                // n8n-style curve: cubic bezier with horizontal handles that
+                // scale with the horizontal gap (minimum keeps a clean arc).
                 const curve = Math.max(60, Math.abs(x2 - x1) / 2);
                 const path = `M ${x1} ${y1} C ${x1 + curve} ${y1}, ${x2 - curve} ${y2}, ${x2} ${y2}`;
+                const hovered = hoveredConnection === index;
+                // The hover ✕ sits at the curve's visual midpoint.
                 const midX = (x1 + x2) / 2;
                 const midY = (y1 + y2) / 2;
+                const clearHover = () =>
+                  setHoveredConnection((current) =>
+                    current === index ? null : current,
+                  );
                 return (
-                  <g key={index}>
+                  // One group per connection: leaving both the line and the
+                  // hover button clears the hover, entering either keeps it.
+                  <g key={index} onPointerLeave={clearHover}>
+                    {/* Invisible hover band along the line: shows the ✕. */}
                     <path
                       d={path}
                       fill="none"
-                      stroke="#475569"
-                      strokeWidth={2}
-                      markerEnd="url(#arrow)"
+                      stroke="transparent"
+                      strokeWidth={8}
+                      pointerEvents="stroke"
+                      style={{ cursor: "pointer" }}
+                      onPointerMove={() => setHoveredConnection(index)}
                     />
-                    <g
-                      style={{ pointerEvents: "auto", cursor: "pointer" }}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        removeConnection(index);
-                      }}
-                    >
-                      <circle cx={midX} cy={midY} r={9} fill="#0f121b" stroke="#475569" />
-                      <path
-                        d={`M ${midX - 3} ${midY - 3} L ${midX + 3} ${midY + 3} M ${midX + 3} ${midY - 3} L ${midX - 3} ${midY + 3}`}
-                        stroke="#94a3b8"
-                        strokeWidth={1.5}
-                      />
-                    </g>
+                    <path
+                      d={path}
+                      fill="none"
+                      stroke={hovered ? "#d4a537" : "#475569"}
+                      strokeWidth={2}
+                      markerEnd={hovered ? "url(#arrow-hover)" : "url(#arrow)"}
+                      pointerEvents="none"
+                    />
+                    {hovered && (
+                      <g
+                        style={{ pointerEvents: "auto", cursor: "pointer" }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          removeConnection(index);
+                        }}
+                      >
+                        <circle cx={midX} cy={midY} r={9} fill="#0f121b" stroke="#d4a537" />
+                        <path
+                          d={`M ${midX - 3} ${midY - 3} L ${midX + 3} ${midY + 3} M ${midX + 3} ${midY - 3} L ${midX - 3} ${midY + 3}`}
+                          stroke="#94a3b8"
+                          strokeWidth={1.5}
+                        />
+                        <title>Remove connection</title>
+                      </g>
+                    )}
                   </g>
                 );
               })}
