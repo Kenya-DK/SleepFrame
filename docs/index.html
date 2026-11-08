@@ -287,7 +287,7 @@ npm run tauri dev</code></pre>
 
           <h3><span class="dot c-input"></span> Inputs</h3>
           <div class="grid">
-            <div class="card"><h4>Focus window</h4><p>Brings a window to the foreground, nudges the cursor and clicks once. See <a href="#focus">Focus window</a>.</p></div>
+            <div class="card"><h4>Focus window</h4><p>Brings a window to the foreground, nudges the cursor and clicks once. Optionally remembers the previously focused window so a <strong>Restore window</strong> node can bring it back. See <a href="#focus">Focus window</a>.</p></div>
             <div class="card"><h4>Key down / Key up</h4><p>Holds or releases a key or shortcut. Accepts combos like <code>Ctrl+Shift</code>.</p></div>
             <div class="card"><h4>Press key</h4><p>Presses and releases a key once. Accepts combos like <code>Ctrl+Space</code>.</p></div>
             <div class="card"><h4>Shortcut</h4><p>Fires a full key combination in one go, e.g. <code>Alt+F4</code>. Has a record button.</p></div>
@@ -382,8 +382,10 @@ npm run tauri dev</code></pre>
             <tr><th>Field</th><th>Meaning</th></tr>
             <tr><td><code>Process</code></td><td>Executable name to focus, e.g. <code>Warframe.x64</code> or <code>notepad</code>.</td></tr>
             <tr><td><code>Window title (optional)</code></td><td>If set, matches a visible window whose title contains this text instead.</td></tr>
+            <tr><td><code>Remember previous window</code></td><td>Records the window focused right before this node so a <a href="#focus">Restore window</a> node can bring it back.</td></tr>
           </table>
           <p>Use the <em>Pick window</em> button to fill both automatically.</p>
+          <p><strong>Restore window</strong> refocuses the window remembered by the last Focus window node with <em>Remember previous window</em> enabled; it does nothing if nothing was remembered. Set <em>Delay before switching</em> to give earlier nodes time to finish before focus moves back.</p>
         </section>
 
         <section id="ocr">

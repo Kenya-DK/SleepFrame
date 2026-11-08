@@ -9,7 +9,7 @@ use windows_sys::Win32::System::Diagnostics::ToolHelp::{
 };
 use windows_sys::Win32::System::Threading::{AttachThreadInput, GetCurrentThreadId};
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
-    BlockInput, GetAsyncKeyState, SetFocus, VK_LBUTTON,
+    keybd_event, BlockInput, GetAsyncKeyState, SetFocus, VK_LBUTTON, VK_MENU, KEYEVENTF_KEYUP,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     BringWindowToTop, EnumWindows, GetCursorPos, GetForegroundWindow, GetWindowRect, GetWindowTextW,
@@ -239,9 +239,45 @@ pub fn window_rect(hwnd: HWND) -> Option<Rect> {
     })
 }
 
-#[allow(dead_code)]
 pub fn foreground_window() -> HWND {
     unsafe { GetForegroundWindow() }
+}
+
+/// Re-focuses a window previously saved by the Focus window node's
+/// "Remember" option. The handle is stored as an isize to avoid leaking
+/// win32 types outside this module.
+///
+/// `Restore window` runs from a background process without the focus it wants
+/// to give away, and Windows refuses to move the foreground in that case. The
+/// Focus window node hides this by clicking, which is not an option here (the
+/// restored window should not receive stray clicks), so instead:
+/// restore it if minimised, tap Alt to unlock `SetForegroundWindow` (MSDN's
+/// own suggestion), then call `set_foreground` with retries until the window
+/// actually owns the foreground.
+pub fn restore_window(hwnd: isize) {
+    let hwnd = hwnd as HWND;
+    if hwnd.is_null() {
+        return;
+    }
+
+    unsafe {
+        if IsIconic(hwnd) != 0 {
+            ShowWindowAsync(hwnd, SW_RESTORE);
+        }
+    }
+
+    for _ in 0..4 {
+        // Alt down/up unlocks SetForegroundWindow for this process.
+        unsafe {
+            keybd_event(VK_MENU as u8, 0, 0, 0);
+            keybd_event(VK_MENU as u8, 0, KEYEVENTF_KEYUP, 0);
+        }
+        set_foreground(hwnd);
+        std::thread::sleep(std::time::Duration::from_millis(80));
+        if unsafe { GetForegroundWindow() } == hwnd {
+            return;
+        }
+    }
 }
 
 /// Current global cursor position, in screen coordinates.

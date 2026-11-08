@@ -42,8 +42,11 @@ pub struct Executor {
     running_nodes: Arc<Mutex<HashSet<String>>>,
     /// Most recent OCR result, shared across branches so Conditions can read it.
     last_ocr: Arc<Mutex<String>>,
-    /// Per-node cursor for `send_messages` nodes with sequential ordering.
+        /// Per-node cursor for `send_messages` nodes with sequential ordering.
     list_indices: HashMap<String, usize>,
+    /// Window that was foreground before the last "remember" Focus window run,
+    /// shared across branches/timers so a Restore window node always sees it.
+    saved_window: Arc<Mutex<Option<isize>>>,
 }
 
 impl Executor {
@@ -53,6 +56,7 @@ impl Executor {
         methods: Arc<Vec<Method>>,
         running_nodes: Arc<Mutex<HashSet<String>>>,
         last_ocr: Arc<Mutex<String>>,
+        saved_window: Arc<Mutex<Option<isize>>>,
     ) -> Result<Self, String> {
         Ok(Self {
             app,
@@ -62,6 +66,7 @@ impl Executor {
             running_nodes,
             last_ocr,
             list_indices: HashMap::new(),
+            saved_window,
         })
     }
 
@@ -253,6 +258,7 @@ impl Executor {
             let methods = self.methods.clone();
             let running_nodes = self.running_nodes.clone();
             let last_ocr = self.last_ocr.clone();
+            let saved_window = self.saved_window.clone();
             let branch_nodes = nodes.to_vec();
             let branch_connections = connections.to_vec();
             let branch_target = target.clone();
@@ -260,7 +266,14 @@ impl Executor {
 
             handles.push(std::thread::spawn(move || {
                 if let Ok(mut executor) =
-                    Executor::new(app, stop.clone(), methods, running_nodes, last_ocr)
+                    Executor::new(
+                        app,
+                        stop.clone(),
+                        methods,
+                        running_nodes,
+                        last_ocr.clone(),
+                        saved_window.clone(),
+                    )
                 {
                     executor.run_nodes(
                         &branch_nodes,
@@ -285,7 +298,24 @@ impl Executor {
             "focus_warframe" => {
                 let process = p_str(node, "process", "Warframe.x64");
                 let title = p_str(node, "title", "");
-                focus_window(&mut self.input, &process, &title);
+                let saved = if p_bool(node, "remember", false) {
+                    Some(self.saved_window.clone())
+                } else {
+                    None
+                };
+                focus_window(&mut self.input, &process, &title, saved.as_ref().map(|v| v.as_ref()));
+                Next::Port("out".into())
+            }
+
+            "restore_window" => {
+                let millis = p_i64(node, "delay_ms", 1000).max(0) as u64;
+                if sleep_until_stopped(&self.stop, millis) {
+                    if let Some(hwnd) =
+                        self.saved_window.lock().ok().and_then(|value| *value)
+                    {
+                        win::restore_window(hwnd);
+                    }
+                }
                 Next::Port("out".into())
             }
 
@@ -506,6 +536,7 @@ impl Executor {
                     let methods = self.methods.clone();
                     let running_nodes = self.running_nodes.clone();
                     let last_ocr = self.last_ocr.clone();
+                    let saved_window = self.saved_window.clone();
                     let timer_node = node.id.clone();
 
                     std::thread::spawn(move || {
@@ -516,8 +547,14 @@ impl Executor {
                             Some(candidate) => candidate.id.clone(),
                             None => return,
                         };
-                        let Ok(mut executor) =
-                            Executor::new(app, stop.clone(), methods, running_nodes, last_ocr)
+                        let Ok(mut executor) = Executor::new(
+                            app,
+                            stop.clone(),
+                            methods,
+                            running_nodes,
+                            last_ocr,
+                            saved_window,
+                        )
                         else {
                             return;
                         };
@@ -862,7 +899,14 @@ fn warframe_center() -> Option<(i32, i32)> {
 
 /// Brings a window into focus, nudges the cursor near its centre and clicks
 /// once. The window is matched by title (if given) or by process name.
-fn focus_window(input: &mut Input, process: &str, title: &str) {
+/// When `saved` is `Some`, the window focused right before this call is
+/// recorded so a Restore window node can bring it back later.
+fn focus_window(
+    input: &mut Input,
+    process: &str,
+    title: &str,
+    saved: Option<&Mutex<Option<isize>>>,
+) {
     let window = if title.trim().is_empty() {
         win::find_process_pid(process).and_then(win::main_window)
     } else {
@@ -872,6 +916,15 @@ fn focus_window(input: &mut Input, process: &str, title: &str) {
     let Some(hwnd) = window else {
         return;
     };
+    if let Some(saved) = saved {
+        if let Ok(mut value) = saved.lock() {
+            *value = Some(win::foreground_window() as isize);
+        }
+    }
+    // Already in the foreground: nothing to do (focus, nudge or click).
+    if win::foreground_window() == hwnd {
+        return;
+    }
     let Some(rect) = win::window_rect(hwnd) else {
         return;
     };

@@ -81,7 +81,7 @@ pub fn toggle(app: &AppHandle) {
 }
 
 pub fn start(app: &AppHandle) {
-    let (workflow, stop, methods, running_nodes, last_ocr) = {
+    let (workflow, stop, methods, running_nodes, last_ocr, saved_window) = {
         let state = app.state::<AppState>();
         let mut engine = state.engine.lock().expect("engine mutex poisoned");
         if engine.running {
@@ -97,7 +97,8 @@ pub fn start(app: &AppHandle) {
         let methods = Arc::new(engine.methods.clone());
         let running_nodes = Arc::new(Mutex::new(HashSet::new()));
         let last_ocr = Arc::new(Mutex::new(String::new()));
-        (workflow, stop, methods, running_nodes, last_ocr)
+        let saved_window = Arc::new(Mutex::new(None));
+        (workflow, stop, methods, running_nodes, last_ocr, saved_window)
     };
 
     update_tray(app, true);
@@ -106,7 +107,7 @@ pub fn start(app: &AppHandle) {
 
     let handle = app.clone();
     std::thread::spawn(move || {
-        match Executor::new(handle.clone(), stop, methods, running_nodes, last_ocr) {
+        match Executor::new(handle.clone(), stop, methods, running_nodes, last_ocr, saved_window) {
             Ok(mut executor) => {
                 if let Err(error) = executor.run(&workflow) {
                     set_status(&handle, &format!("Error: {error}"));

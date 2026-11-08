@@ -22,7 +22,8 @@ GitHub Pages (Settings → Pages → Branch `main`, folder `/docs`).
   wait + key up), **shortcut (key combos)**, type text, send messages (with an
   editable string list), click, double click, move mouse, focus Warframe, wait
   (with countdown + notification), condition (true/false routing), repeat
-  (optionally every X time), call method, method timer, notification.
+  (optionally every X time), call method, method timer, notification, restore
+  window (refocuses the window active before a Focus window node).
 - **Read text (OCR)** — capture a screen region and read its text with a
   **bundled, pure-Rust OCR engine**. No Tesseract or other install needed, and
   the detection/recognition models are embedded in the binary. Picking a region

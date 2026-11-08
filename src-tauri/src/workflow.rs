@@ -383,7 +383,8 @@ fn node_help(kind: &str) -> &'static str {
     match kind {
         "start" => "The entry point. Every macro runs from here; exactly one Start is expected.",
         "end" => "Ends this branch of the workflow. Nothing after an End is reached.",
-        "focus_warframe" => "Brings a window to the front, moves the cursor near its centre and left-clicks, so the game receives later input. Match by process name, or by window title.",
+        "focus_warframe" => "Brings a window to the front, moves the cursor near its centre and left-clicks, so the game receives later input. Match by process name, or by window title. Enable Remember to record the previously focused window for a Restore window node.",
+        "restore_window" => "Brings back the window that was focused before the last Focus window node with Remember enabled. Waits the configured delay first, so earlier nodes have time to finish. Does nothing if no window was remembered.",
         "key_down" => "Presses and holds a key (or combination) until a matching Key up, or until the macro stops.",
         "key_up" => "Releases a key that was held with Key down.",
         "key_press" => "Presses and releases a key once. Accepts combinations like Ctrl+Space.",
@@ -445,7 +446,17 @@ pub fn node_specs() -> Vec<NodeSpec> {
             vec![
                 text("process", "Process", "Warframe.x64", "e.g. Warframe.x64, notepad"),
                 text("title", "Window title (optional)", "", "match by title instead"),
+                checkbox("remember", "Remember previous window", false),
             ],
+        ),
+        spec(
+            "restore_window",
+            "Restore window",
+            "input",
+            "Refocuses the window that was foreground before the last Remember-enabled Focus window node.",
+            COLOR_INPUT,
+            &["out"],
+            vec![duration("delay_ms", "Delay before switching", 1000.0)],
         ),
         spec(
             "key_down",
